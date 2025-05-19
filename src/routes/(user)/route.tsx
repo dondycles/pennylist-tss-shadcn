@@ -21,9 +21,11 @@ function RouteComponent() {
 
   if (user)
     return (
-      <>
-        <Outlet />
-        <FloatingNav />
-      </>
+      <div className="h-dvh w-full">
+        <div className="mx-auto h-full w-full max-w-4xl">
+          <Outlet />
+          <FloatingNav />
+        </div>
+      </div>
     );
 }

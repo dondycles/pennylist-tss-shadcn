@@ -1,7 +1,7 @@
 import { useMoneyState } from "@/lib/stores/money-state";
 import { usePageState } from "@/lib/stores/page-state";
 import { Link } from "@tanstack/react-router";
-import { ChevronLeft, Eye, EyeOff, Plus } from "lucide-react";
+import { ChevronLeft, Eye, EyeOff, Plus, Settings } from "lucide-react";
 import { motion } from "motion/react";
 import MoneyFormDialog from "./MoneyFormDialog";
 import ThemeToggle from "./ThemeToggle";
@@ -10,7 +10,10 @@ export default function FloatingNav() {
   const pageState = usePageState();
   const moneyState = useMoneyState();
   return (
-    <nav className="bg-muted fixed bottom-4 left-1/2 z-50 flex max-h-9 w-fit max-w-4xl -translate-x-1/2 items-center justify-center gap-1 rounded-full drop-shadow-xl">
+    <motion.nav
+      layout
+      className="bg-muted fixed bottom-4 left-1/2 z-50 flex max-h-9 w-fit max-w-4xl -translate-x-1/2 items-center justify-center gap-1 rounded-full drop-shadow-xl"
+    >
       <Button
         onClick={() => moneyState.setAsterisk(!moneyState.asterisk)}
         type="button"
@@ -19,11 +22,11 @@ export default function FloatingNav() {
       >
         {!moneyState.asterisk ? (
           <Motion key="eyeoff">
-            <EyeOff />
+            <EyeOff className="size-5" />
           </Motion>
         ) : (
           <Motion key="eyeon">
-            <Eye />
+            <Eye className="size-5" />
           </Motion>
         )}
       </Button>
@@ -40,17 +43,21 @@ export default function FloatingNav() {
           </Button>
         </MoneyFormDialog>
       ) : (
-        <Link to="/list">
-          <Button type="button" size="icon" className="mb-2 size-12">
+        <Button asChild type="button" size="icon" className="mb-2 size-12">
+          <Link to="/list">
             <Motion key="back">
               <ChevronLeft className="size-5" />
             </Motion>
-          </Button>
-        </Link>
+          </Link>
+        </Button>
       )}
-
       <ThemeToggle />
-    </nav>
+      <Button hidden={!pageState.showSettingsBtn} asChild size={"icon"} variant={"ghost"}>
+        <Link to="/settings">
+          <Settings className="size-5" />
+        </Link>
+      </Button>
+    </motion.nav>
   );
 }
 

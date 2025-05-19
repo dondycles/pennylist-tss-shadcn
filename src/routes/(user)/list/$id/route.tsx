@@ -9,7 +9,7 @@ function RouteComponent() {
   return (
     <>
       <Outlet />
-      <PageStatusSetter showAddMoneyBtn={false} />
+      <PageStatusSetter state={{ showAddMoneyBtn: false, showSettingsBtn: true }} />
     </>
   );
 }

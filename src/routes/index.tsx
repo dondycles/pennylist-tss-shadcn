@@ -1,7 +1,6 @@
 import ThemeToggle from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
-import authClient from "@/lib/auth-client";
-import { Link, createFileRoute, useRouter } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
   component: Home,
@@ -11,10 +10,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const { queryClient } = Route.useRouteContext();
   const { user } = Route.useLoaderData();
-  const router = useRouter();
-
   const features = [
     {
       title: "Like A Social Media",
@@ -55,17 +51,8 @@ function Home() {
             <Button type="button" asChild className="mb-2 w-fit">
               <Link to="/list">Go to List</Link>
             </Button>
-            <Button
-              onClick={async () => {
-                await authClient.signOut();
-                await queryClient.invalidateQueries({ queryKey: ["user"] });
-                await router.invalidate();
-              }}
-              type="button"
-              className="w-fit"
-              variant="destructive"
-            >
-              Sign out
+            <Button asChild type="button" className="w-fit" variant="destructive">
+              <Link to="/logout">Sign out</Link>
             </Button>
             <ThemeToggle />
           </div>

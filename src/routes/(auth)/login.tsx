@@ -25,7 +25,6 @@ function LoginForm() {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
     if (!email || !password) return;
-
     setIsLoading(true);
     setErrorMessage("");
 

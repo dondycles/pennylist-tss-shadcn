@@ -1,15 +1,15 @@
-import { usePageState } from "@/lib/stores/page-state";
+import { PageState, usePageState } from "@/lib/stores/page-state";
 import { useEffect } from "react";
 
 export default function PageStatusSetter({
-  showAddMoneyBtn,
+  state,
 }: {
-  showAddMoneyBtn: boolean;
+  state: Omit<PageState, "setState">;
 }) {
   const pageState = usePageState();
 
   useEffect(() => {
-    pageState.setShowAddMoneyBtn(showAddMoneyBtn);
+    pageState.setState(state);
   }, []);
   return null;
 }

@@ -17,8 +17,8 @@ function RouteComponent() {
 
   return (
     <>
-      <PageStatusSetter showAddMoneyBtn={true} />
-      <div>
+      <PageStatusSetter state={{ showAddMoneyBtn: true, showSettingsBtn: true }} />
+      <div className="pb-32">
         {moneys.data?.map((m) => (
           <MoneyCard moneysQty={moneys.data.length} deepView={false} m={m} key={m.id} />
         ))}

@@ -16,15 +16,22 @@ const storage: StateStorage = {
 
 export type PageState = {
   showAddMoneyBtn: boolean;
-  setShowAddMoneyBtn: (state: boolean) => void;
+  showSettingsBtn: boolean;
+  setState: ({
+    showAddMoneyBtn,
+    showSettingsBtn,
+  }: {
+    showAddMoneyBtn: boolean;
+    showSettingsBtn: boolean;
+  }) => void;
 };
 
 export const usePageState = create<PageState>()(
   persist(
     (set) => ({
       showAddMoneyBtn: false,
-
-      setShowAddMoneyBtn: (state) => set(() => ({ showAddMoneyBtn: state })),
+      showSettingsBtn: false,
+      setState: (state) => set(() => state),
     }),
     {
       name: "page-state",

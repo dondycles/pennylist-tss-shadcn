@@ -12,11 +12,12 @@ export default function TotalMoneyBar() {
   });
 
   return (
-    <div className="bg-background w-full rounded-b-3xl p-8 text-center shadow-xl dark:bg-neutral-900">
+    <div className="bg-background w-full space-y-1 rounded-b-3xl p-8 text-center shadow-xl dark:bg-neutral-900">
+      <p className="text-muted-foreground">Total money</p>
       <Amount
         className="truncate text-4xl font-bold"
         amount={totalMoney.data ?? 0}
-        settings={{ sign: true, hide: false }}
+        settings={{ sign: true }}
       />
     </div>
   );

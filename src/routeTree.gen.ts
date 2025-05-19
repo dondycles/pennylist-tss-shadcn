@@ -11,17 +11,25 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as LogoutImport } from './routes/logout'
 import { Route as userRouteImport } from './routes/(user)/route'
 import { Route as authRouteImport } from './routes/(auth)/route'
 import { Route as IndexImport } from './routes/index'
 import { Route as authSignupImport } from './routes/(auth)/signup'
 import { Route as authLoginImport } from './routes/(auth)/login'
 import { Route as userListRouteImport } from './routes/(user)/list/route'
+import { Route as userSettingsIndexImport } from './routes/(user)/settings/index'
 import { Route as userListIndexImport } from './routes/(user)/list/index'
 import { Route as userListIdRouteImport } from './routes/(user)/list/$id/route'
 import { Route as userListIdIndexImport } from './routes/(user)/list/$id/index'
 
 // Create/Update Routes
+
+const LogoutRoute = LogoutImport.update({
+  id: '/logout',
+  path: '/logout',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const userRouteRoute = userRouteImport.update({
   id: '/(user)',
@@ -54,6 +62,12 @@ const authLoginRoute = authLoginImport.update({
 const userListRouteRoute = userListRouteImport.update({
   id: '/list',
   path: '/list',
+  getParentRoute: () => userRouteRoute,
+} as any)
+
+const userSettingsIndexRoute = userSettingsIndexImport.update({
+  id: '/settings/',
+  path: '/settings/',
   getParentRoute: () => userRouteRoute,
 } as any)
 
@@ -100,6 +114,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof userRouteImport
       parentRoute: typeof rootRoute
     }
+    '/logout': {
+      id: '/logout'
+      path: '/logout'
+      fullPath: '/logout'
+      preLoaderRoute: typeof LogoutImport
+      parentRoute: typeof rootRoute
+    }
     '/(user)/list': {
       id: '/(user)/list'
       path: '/list'
@@ -134,6 +155,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/list/'
       preLoaderRoute: typeof userListIndexImport
       parentRoute: typeof userListRouteImport
+    }
+    '/(user)/settings/': {
+      id: '/(user)/settings/'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof userSettingsIndexImport
+      parentRoute: typeof userRouteImport
     }
     '/(user)/list/$id/': {
       id: '/(user)/list/$id/'
@@ -189,10 +217,12 @@ const userListRouteRouteWithChildren = userListRouteRoute._addFileChildren(
 
 interface userRouteRouteChildren {
   userListRouteRoute: typeof userListRouteRouteWithChildren
+  userSettingsIndexRoute: typeof userSettingsIndexRoute
 }
 
 const userRouteRouteChildren: userRouteRouteChildren = {
   userListRouteRoute: userListRouteRouteWithChildren,
+  userSettingsIndexRoute: userSettingsIndexRoute,
 }
 
 const userRouteRouteWithChildren = userRouteRoute._addFileChildren(
@@ -201,19 +231,23 @@ const userRouteRouteWithChildren = userRouteRoute._addFileChildren(
 
 export interface FileRoutesByFullPath {
   '/': typeof userRouteRouteWithChildren
+  '/logout': typeof LogoutRoute
   '/list': typeof userListRouteRouteWithChildren
   '/login': typeof authLoginRoute
   '/signup': typeof authSignupRoute
   '/list/$id': typeof userListIdRouteRouteWithChildren
   '/list/': typeof userListIndexRoute
+  '/settings': typeof userSettingsIndexRoute
   '/list/$id/': typeof userListIdIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof userRouteRouteWithChildren
+  '/logout': typeof LogoutRoute
   '/login': typeof authLoginRoute
   '/signup': typeof authSignupRoute
   '/list': typeof userListIndexRoute
+  '/settings': typeof userSettingsIndexRoute
   '/list/$id': typeof userListIdIndexRoute
 }
 
@@ -222,11 +256,13 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/(auth)': typeof authRouteRouteWithChildren
   '/(user)': typeof userRouteRouteWithChildren
+  '/logout': typeof LogoutRoute
   '/(user)/list': typeof userListRouteRouteWithChildren
   '/(auth)/login': typeof authLoginRoute
   '/(auth)/signup': typeof authSignupRoute
   '/(user)/list/$id': typeof userListIdRouteRouteWithChildren
   '/(user)/list/': typeof userListIndexRoute
+  '/(user)/settings/': typeof userSettingsIndexRoute
   '/(user)/list/$id/': typeof userListIdIndexRoute
 }
 
@@ -234,24 +270,35 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/logout'
     | '/list'
     | '/login'
     | '/signup'
     | '/list/$id'
     | '/list/'
+    | '/settings'
     | '/list/$id/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/signup' | '/list' | '/list/$id'
+  to:
+    | '/'
+    | '/logout'
+    | '/login'
+    | '/signup'
+    | '/list'
+    | '/settings'
+    | '/list/$id'
   id:
     | '__root__'
     | '/'
     | '/(auth)'
     | '/(user)'
+    | '/logout'
     | '/(user)/list'
     | '/(auth)/login'
     | '/(auth)/signup'
     | '/(user)/list/$id'
     | '/(user)/list/'
+    | '/(user)/settings/'
     | '/(user)/list/$id/'
   fileRoutesById: FileRoutesById
 }
@@ -260,12 +307,14 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   authRouteRoute: typeof authRouteRouteWithChildren
   userRouteRoute: typeof userRouteRouteWithChildren
+  LogoutRoute: typeof LogoutRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   authRouteRoute: authRouteRouteWithChildren,
   userRouteRoute: userRouteRouteWithChildren,
+  LogoutRoute: LogoutRoute,
 }
 
 export const routeTree = rootRoute
@@ -280,7 +329,8 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/(auth)",
-        "/(user)"
+        "/(user)",
+        "/logout"
       ]
     },
     "/": {
@@ -296,8 +346,12 @@ export const routeTree = rootRoute
     "/(user)": {
       "filePath": "(user)/route.tsx",
       "children": [
-        "/(user)/list"
+        "/(user)/list",
+        "/(user)/settings/"
       ]
+    },
+    "/logout": {
+      "filePath": "logout.tsx"
     },
     "/(user)/list": {
       "filePath": "(user)/list/route.tsx",
@@ -325,6 +379,10 @@ export const routeTree = rootRoute
     "/(user)/list/": {
       "filePath": "(user)/list/index.tsx",
       "parent": "/(user)/list"
+    },
+    "/(user)/settings/": {
+      "filePath": "(user)/settings/index.tsx",
+      "parent": "/(user)"
     },
     "/(user)/list/$id/": {
       "filePath": "(user)/list/$id/index.tsx",

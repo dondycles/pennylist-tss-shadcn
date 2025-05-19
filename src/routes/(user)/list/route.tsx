@@ -7,11 +7,9 @@ export const Route = createFileRoute("/(user)/list")({
 
 function RouteComponent() {
   return (
-    <div className="h-dvh w-full">
-      <div className="mx-auto w-full max-w-4xl">
-        <TotalMoneyBar />
-        <Outlet />
-      </div>
-    </div>
+    <>
+      <TotalMoneyBar />
+      <Outlet />
+    </>
   );
 }
