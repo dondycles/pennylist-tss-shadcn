@@ -189,6 +189,10 @@ export const transferMoneys = createServerFn({ method: "POST" })
         moneyId: sender.id,
         type: "transfer",
         reason: sender.reason ?? undefined,
+        transferDetails: {
+          receivers,
+          sender,
+        },
       },
     });
 
@@ -211,6 +215,10 @@ export const transferMoneys = createServerFn({ method: "POST" })
             moneyId: receiver.id,
             type: "transfer",
             reason: receiver.reason ?? undefined,
+            transferDetails: {
+              receivers,
+              sender,
+            },
           },
         });
       }

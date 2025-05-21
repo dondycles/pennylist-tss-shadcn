@@ -4,6 +4,8 @@ import { moneySchema } from "../fn/money";
 import { user } from "./auth.schema";
 import { money } from "./money.schema";
 
+type MoneyPrimaryDataOnly = Omit<z.infer<typeof moneySchema>, "reason">;
+
 export const log = pgTable("log", {
   id: text("id")
     .primaryKey()
@@ -18,8 +20,16 @@ export const log = pgTable("log", {
   reason: text("reason"),
   changes: jsonb("changes")
     .$type<{
-      prev: z.infer<typeof moneySchema> & { totalMoney: number };
-      current: z.infer<typeof moneySchema> & { totalMoney: number };
+      prev: MoneyPrimaryDataOnly & { totalMoney: number };
+      current: MoneyPrimaryDataOnly & { totalMoney: number };
     }>()
     .notNull(),
+  transferDetails: jsonb("transferDetails").$type<{
+    sender: MoneyPrimaryDataOnly & { id: string };
+    receivers: (MoneyPrimaryDataOnly & {
+      id: string;
+      fee?: number | null;
+      cashIn?: number | null;
+    })[];
+  }>(),
 });

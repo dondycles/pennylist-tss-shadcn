@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { create } from "zustand";
 import { Money, moneyWithTransferDetailsSchema } from "../server/fn/money";
+
 export type MoneyWithTransferDetails = Money & {
   fee?: number;
   reason?: string;

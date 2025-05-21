@@ -16,12 +16,25 @@ export const logSchema = z.object({
   changes: z.object({
     prev: moneySchema
       .omit({ reason: true })
-      .extend({ totalMoney: z.coerce.number().nonnegative() }),
+      .extend({ totalMoney: z.coerce.number().nonnegative().default(0) }),
     current: moneySchema
       .omit({ reason: true })
-      .extend({ totalMoney: z.coerce.number().nonnegative() }),
+      .extend({ totalMoney: z.coerce.number().nonnegative().default(0) }),
   }),
   reason: z.string().optional(),
+  transferDetails: z
+    .object({
+      sender: moneySchema.omit({ reason: true }).extend({ id: z.string() }),
+      receivers: z.array(
+        moneySchema.omit({ reason: true }).extend({
+          fee: z.coerce.number().nonnegative().optional().nullable(),
+          cashIn: z.coerce.number().nonnegative().optional().nullable(),
+          id: z.string(),
+        }),
+      ),
+    })
+    .optional()
+    .nullable(),
 });
 
 export const addLog = createServerFn({ method: "POST" })
