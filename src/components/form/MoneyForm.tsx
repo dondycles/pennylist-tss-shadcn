@@ -13,12 +13,14 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useMoneyState } from "@/lib/stores/money-state";
 import { useRouteContext } from "@tanstack/react-router";
 import { Loader2, RotateCw } from "lucide-react";
 import ActionConfirmDialog from "../ActionConfirmDialog";
 import ColorPicker from "../ColorPickerDialog";
 import MoneyInput from "../MoneyInput";
 import { DialogClose } from "../ui/dialog";
+import { Textarea } from "../ui/textarea";
 
 export default function MoneyForm({
   close,
@@ -30,25 +32,30 @@ export default function MoneyForm({
   deepView: boolean;
 }) {
   const { queryClient, user } = useRouteContext({ from: "__root__" });
+  const { total: totalMoney } = useMoneyState();
   const moneyForm = useForm<z.infer<typeof moneySchema>>({
     resolver: zodResolver(moneySchema),
     defaultValues: {
       amount: initialData ? initialData.amount : undefined,
       name: initialData ? initialData.name : undefined,
-      color: initialData
-        ? initialData.color
-          ? initialData.color
-          : undefined
-        : undefined,
+      color: initialData ? initialData.color : undefined,
+      reason: undefined,
     },
   });
 
   const handleMoney = useMutation({
     mutationFn: async (money: z.infer<typeof moneySchema>) => {
       if (initialData) {
-        return await editMoney({ data: { ...money, id: initialData.id } });
+        return await editMoney({
+          data: {
+            current: { ...initialData, ...money },
+            prev: initialData,
+            totalMoney,
+            reason: money.reason,
+          },
+        });
       }
-      return await addMoney({ data: money });
+      return await addMoney({ data: { ...money, totalMoney } });
     },
     onSuccess: () => {
       if (deepView) {
@@ -58,6 +65,9 @@ export default function MoneyForm({
         if (user) queryClient.invalidateQueries({ queryKey: ["moneys", user.id] });
       }
       close();
+    },
+    onError: (e) => {
+      alert(e.message);
     },
   });
 
@@ -117,6 +127,7 @@ export default function MoneyForm({
                       className="flex-1"
                       placeholder="Color"
                       {...field}
+                      value={field.value ?? ""}
                     />
                     {field.value ? (
                       <Button
@@ -130,6 +141,23 @@ export default function MoneyForm({
                     ) : null}
                   </div>
                 </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={moneyForm.control}
+          name="reason"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <Textarea
+                  hidden={!initialData}
+                  placeholder="Reason (Optional)"
+                  {...field}
+                  value={field.value ?? ""}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

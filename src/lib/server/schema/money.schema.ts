@@ -1,4 +1,4 @@
-import { integer, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { numeric, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { user } from "./auth.schema";
 
 export const money = pgTable("money", {
@@ -7,9 +7,9 @@ export const money = pgTable("money", {
     .$default(() => crypto.randomUUID())
     .notNull(),
   name: text("name").notNull(),
-  amount: integer("amount").notNull(),
-  createdAt: timestamp("created_at").notNull(),
-  updatedAt: timestamp("updated_at").notNull(),
+  amount: numeric("amount", { mode: "number" }).notNull(),
+  createdAt: timestamp("created_at").$default(() => new Date()),
+  updatedAt: timestamp("updated_at").$default(() => new Date()),
   color: text("color"),
   userId: text("userId")
     .notNull()

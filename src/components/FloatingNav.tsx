@@ -1,35 +1,16 @@
-import { useMoneyState } from "@/lib/stores/money-state";
 import { usePageState } from "@/lib/stores/page-state";
 import { Link } from "@tanstack/react-router";
-import { ChevronLeft, Eye, EyeOff, Plus, Settings } from "lucide-react";
+import { ChartGantt, ChevronLeft, Plus, Settings } from "lucide-react";
 import { motion } from "motion/react";
 import MoneyFormDialog from "./MoneyFormDialog";
-import ThemeToggle from "./ThemeToggle";
 import { Button } from "./ui/button";
 export default function FloatingNav() {
   const pageState = usePageState();
-  const moneyState = useMoneyState();
   return (
     <motion.nav
       layout
       className="bg-muted fixed bottom-4 left-1/2 z-50 flex max-h-9 w-fit max-w-4xl -translate-x-1/2 items-center justify-center gap-1 rounded-full drop-shadow-xl"
     >
-      <Button
-        onClick={() => moneyState.setAsterisk(!moneyState.asterisk)}
-        type="button"
-        size={"icon"}
-        variant={"ghost"}
-      >
-        {!moneyState.asterisk ? (
-          <Motion key="eyeoff">
-            <EyeOff className="size-5" />
-          </Motion>
-        ) : (
-          <Motion key="eyeon">
-            <Eye className="size-5" />
-          </Motion>
-        )}
-      </Button>
       {pageState.showAddMoneyBtn ? (
         <MoneyFormDialog
           deepView={false}
@@ -51,7 +32,17 @@ export default function FloatingNav() {
           </Link>
         </Button>
       )}
-      <ThemeToggle />
+      <Button
+        hidden={!pageState.showLogsPageBtn}
+        asChild
+        type="button"
+        size={"icon"}
+        variant={"ghost"}
+      >
+        <Link to="/logs">
+          <ChartGantt className="size-5" />
+        </Link>
+      </Button>
       <Button hidden={!pageState.showSettingsBtn} asChild size={"icon"} variant={"ghost"}>
         <Link to="/settings">
           <Settings className="size-5" />

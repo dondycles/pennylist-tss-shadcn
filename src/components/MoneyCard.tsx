@@ -1,7 +1,9 @@
 import { deleteMoney, Money } from "@/lib/server/fn/money";
-import { useMutation } from "@tanstack/react-query";
-import { Link, useRouteContext } from "@tanstack/react-router";
-import { ExternalLink, Pencil, Send, Trash2 } from "lucide-react";
+import { GetUser } from "@/lib/server/fn/user";
+import { useTransferState } from "@/lib/stores/transfer-state";
+import { QueryClient, useMutation } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
+import { ExternalLink, Pencil, PlaneLanding, Send, Trash2 } from "lucide-react";
 import ActionConfirmDialog from "./ActionConfirmDialog";
 import Amount from "./Amount";
 import MoneyFormDialog from "./MoneyFormDialog";
@@ -12,12 +14,26 @@ export default function MoneyCard({
   m,
   deepView,
   moneysQty,
+  user,
+  queryClient,
+  totalMoney,
 }: {
   m: Money;
   deepView: boolean;
   moneysQty: number;
+  user: GetUser;
+  queryClient: QueryClient;
+  totalMoney: number;
 }) {
-  const { queryClient, user } = useRouteContext({ from: "__root__" });
+  const transferState = useTransferState();
+
+  const transferRole =
+    transferState.sender?.id === m.id
+      ? "sender"
+      : (transferState.receivers?.some((r) => r.id === m.id) ?? false)
+        ? "reicever"
+        : "none";
+
   const handleDeleteMoney = useMutation({
     mutationFn: async () =>
       await deleteMoney({
@@ -25,7 +41,8 @@ export default function MoneyCard({
           amount: m.amount,
           id: m.id,
           name: m.name,
-          color: m.color ?? undefined,
+          color: m.color,
+          totalMoney,
         },
       }),
     onSuccess: () => {
@@ -39,16 +56,26 @@ export default function MoneyCard({
       }
     },
   });
+
+  if (!user) return null;
   return (
     <div
+      hidden={transferRole !== "none"}
       key={m.id}
       style={{
         color: m.color ?? "var(--foreground)",
-        borderColor: m.color ? `${m.color}20` : "var(--border)",
       }}
-      className={`p-4 font-bold ${deepView ? "border-b" : "not-first:border-t"} ${handleDeleteMoney.isPending && "animate-pulse"}`}
+      className={`p-4 font-bold ${deepView ? "border-b" : "not-last:border-b"} ${handleDeleteMoney.isPending && "animate-pulse"}`}
     >
       <p className="truncate">{m.name}</p>
+      {/* <Separator />
+      <p>Role: {transferRole}</p>
+      <Separator />
+      <p>Sender: {JSON.stringify(transferState.sender)}</p>
+      <Separator />
+      <p>Receivers: {JSON.stringify(transferState.receivers)}</p>
+      <Separator /> */}
+
       <Amount
         className="text-base font-bold"
         amount={m.amount}
@@ -77,12 +104,17 @@ export default function MoneyCard({
             </Button>
           </MoneyFormDialog>
           <Button
+            onClick={() => transferState.selectForTransfer(m)}
             hidden={moneysQty <= 1}
             disabled={moneysQty <= 0}
             size={"icon"}
             variant={"ghost"}
           >
-            <Send className="size-4" />
+            {transferState.sender ? (
+              <PlaneLanding className="size-4" />
+            ) : (
+              <Send className="size-4" />
+            )}
           </Button>
           <ActionConfirmDialog
             confirm={handleDeleteMoney.mutate}

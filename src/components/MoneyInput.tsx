@@ -10,7 +10,7 @@ export default function MoneyInput({
   return (
     <div className={cn("relative h-fit w-fit", className)}>
       <Input className="indent-5" type={type} {...props} />
-      <DollarSign className="text-muted-foreground bg-background absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+      <DollarSign className="text-muted-foreground absolute top-1/2 left-px box-content size-4 -translate-y-1/2 rounded-full p-2 backdrop-blur-2xl" />
     </div>
   );
 }

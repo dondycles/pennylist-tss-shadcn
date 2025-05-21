@@ -1,25 +1,37 @@
 import MoneyCard from "@/components/MoneyCard";
-import { NotFound } from "@/components/NotFound";
-import { Skeleton } from "@/components/ui/skeleton";
+import MoneySkeleton from "@/components/MoneySkeleton";
 import { moneyQueryOptions } from "@/lib/queries/money";
-import { useQuery } from "@tanstack/react-query";
+import { useMoneyState } from "@/lib/stores/money-state";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { Suspense } from "react";
 
 export const Route = createFileRoute("/(user)/list/$id/")({
   component: RouteComponent,
 });
 
-export const useRefetchMoneyDeepViewPage = () => {
-  const { queryClient, user } = Route.useRouteContext();
-  const { id } = Route.useParams();
-  if (user && id) queryClient.invalidateQueries(moneyQueryOptions(id));
-};
-
 function RouteComponent() {
-  const { id } = Route.useParams();
-  const m = useQuery({ ...moneyQueryOptions(id) });
+  return (
+    <Suspense fallback={<MoneySkeleton />}>
+      <Money />
+    </Suspense>
+  );
+}
 
-  if (m.isLoading) return <Skeleton className="mt-4 h-24 w-full rounded-3xl" />;
-  if (m.data) return <MoneyCard moneysQty={1} deepView={true} m={m.data} />;
-  return <NotFound />;
+function Money() {
+  const { id } = Route.useParams();
+  const { queryClient, user } = Route.useRouteContext();
+  const { total } = useMoneyState();
+
+  const m = useSuspenseQuery(moneyQueryOptions(id));
+  return (
+    <MoneyCard
+      queryClient={queryClient}
+      user={user}
+      moneysQty={1}
+      deepView={true}
+      m={m.data}
+      totalMoney={total}
+    />
+  );
 }

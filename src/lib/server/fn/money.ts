@@ -1,16 +1,33 @@
 import { authMiddleware } from "@/lib/middleware/auth-guard";
 import { createServerFn } from "@tanstack/react-start";
 import { and, eq } from "drizzle-orm";
+import _ from "lodash";
 import z from "zod";
 import { db } from "../db";
 import { money } from "../schema/money.schema";
+import { addLog } from "./logs";
 
 export const moneySchema = z.object({
   name: z.string().min(1),
-  amount: z.coerce.number().min(1),
-  color: z.string().optional(),
+  amount: z.coerce.number().nonnegative(),
+  color: z.string().optional().nullable(),
+  reason: z.string().optional().nullable(),
 });
-
+export const moneyWithIdSchema = moneySchema.extend({ id: z.string() });
+export const moneyWithTransferDetailsSchema = moneySchema.extend({
+  id: z.string(),
+  cashIn: z.coerce.number().nonnegative().optional(),
+  fee: z.number().optional(),
+});
+export const transferSchema = z.object({
+  sender: moneyWithTransferDetailsSchema,
+  receivers: z.array(moneyWithTransferDetailsSchema),
+});
+export const editMoneySchema = z.object({
+  prev: moneyWithIdSchema.omit({ reason: true }),
+  current: moneyWithIdSchema.omit({ reason: true }),
+  reason: z.string().optional().nullable(),
+});
 export const getMoneys = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .handler(
@@ -65,35 +82,130 @@ export type Money = Awaited<ReturnType<typeof getMoneys>>[0];
 
 export const addMoney = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
-  .validator(moneySchema)
+  .validator(moneySchema.extend({ totalMoney: z.coerce.number().nonnegative() }))
   .handler(async ({ data: moneyData, context: { user } }) => {
-    await db.insert(money).values({
-      ...moneyData,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      userId: user.id,
+    const insteredMoneyData = await db
+      .insert(money)
+      .values({
+        ...moneyData,
+        userId: user.id,
+      })
+      .returning();
+    await addLog({
+      data: {
+        changes: {
+          current: {
+            ...insteredMoneyData[0],
+            totalMoney: moneyData.totalMoney + moneyData.amount,
+          },
+          prev: { ...insteredMoneyData[0], totalMoney: moneyData.totalMoney },
+        },
+        moneyId: insteredMoneyData[0].id,
+        type: "add",
+        reason: "Add",
+      },
     });
   });
 
 export const editMoney = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
-  .validator(moneySchema.extend({ id: z.string() }))
-  .handler(async ({ data: moneyData, context: { user } }) => {
+  .validator(editMoneySchema.extend({ totalMoney: z.coerce.number().nonnegative() }))
+  .handler(async ({ data: { current, prev, totalMoney, reason }, context: { user } }) => {
     await db
       .update(money)
       .set({
-        ...moneyData,
-        createdAt: new Date(),
+        ...current,
         updatedAt: new Date(),
       })
-      .where(and(eq(money.id, moneyData.id), eq(money.userId, user.id)));
+      .where(and(eq(money.id, current.id), eq(money.userId, user.id)));
+    await addLog({
+      data: {
+        changes: {
+          current: {
+            ...current,
+            totalMoney: totalMoney + (current.amount - prev.amount),
+          },
+          prev: { ...prev, totalMoney },
+        },
+        moneyId: current.id,
+        type: "edit",
+        reason: reason ?? undefined,
+      },
+    });
   });
 
 export const deleteMoney = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
-  .validator(moneySchema.extend({ id: z.string() }))
+  .validator(moneyWithIdSchema.extend({ totalMoney: z.coerce.number().nonnegative() }))
   .handler(async ({ data: moneyData, context: { user } }) => {
     await db
       .delete(money)
       .where(and(eq(money.id, moneyData.id), eq(money.userId, user.id)));
+    await addLog({
+      data: {
+        changes: {
+          current: {
+            amount: 0,
+            name: "",
+            color: "",
+            totalMoney: moneyData.totalMoney - moneyData.amount,
+          },
+          prev: moneyData,
+        },
+        moneyId: moneyData.id,
+        type: "edit",
+        reason: "Deletion",
+      },
+    });
+  });
+
+export const transferMoneys = createServerFn({ method: "POST" })
+  .middleware([authMiddleware])
+  .validator(transferSchema.extend({ totalMoney: z.coerce.number().nonnegative() }))
+  .handler(async ({ data: { receivers, sender, totalMoney }, context: { user } }) => {
+    const fees = _.sum(receivers.map((r) => r.fee ?? 0));
+    const cashIns = _.sum(receivers.map((r) => r.cashIn ?? 0));
+    await db
+      .update(money)
+      .set({ ...sender, amount: sender.amount - fees - cashIns })
+      .where(and(eq(money.id, sender.id), eq(money.userId, user.id)));
+    await addLog({
+      data: {
+        changes: {
+          current: {
+            ...sender,
+            amount: sender.amount - fees - cashIns,
+            totalMoney: totalMoney - fees,
+          },
+          prev: { ...sender, totalMoney },
+        },
+        moneyId: sender.id,
+        type: "transfer",
+        reason: sender.reason ?? undefined,
+      },
+    });
+
+    await db.transaction(async (tx) => {
+      for (const receiver of receivers) {
+        await tx
+          .update(money)
+          .set({ ...receiver, amount: receiver.amount + (receiver.cashIn ?? 0) })
+          .where(and(eq(money.id, receiver.id), eq(money.userId, user.id)));
+        await addLog({
+          data: {
+            changes: {
+              current: {
+                ...receiver,
+                amount: receiver.amount + (receiver.cashIn ?? 0),
+                totalMoney: totalMoney - fees,
+              },
+              prev: { ...receiver, totalMoney: totalMoney },
+            },
+            moneyId: receiver.id,
+            type: "transfer",
+            reason: receiver.reason ?? undefined,
+          },
+        });
+      }
+    });
   });

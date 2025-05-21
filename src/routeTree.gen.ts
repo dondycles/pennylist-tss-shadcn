@@ -19,6 +19,7 @@ import { Route as authSignupImport } from './routes/(auth)/signup'
 import { Route as authLoginImport } from './routes/(auth)/login'
 import { Route as userListRouteImport } from './routes/(user)/list/route'
 import { Route as userSettingsIndexImport } from './routes/(user)/settings/index'
+import { Route as userLogsIndexImport } from './routes/(user)/logs/index'
 import { Route as userListIndexImport } from './routes/(user)/list/index'
 import { Route as userListIdRouteImport } from './routes/(user)/list/$id/route'
 import { Route as userListIdIndexImport } from './routes/(user)/list/$id/index'
@@ -68,6 +69,12 @@ const userListRouteRoute = userListRouteImport.update({
 const userSettingsIndexRoute = userSettingsIndexImport.update({
   id: '/settings/',
   path: '/settings/',
+  getParentRoute: () => userRouteRoute,
+} as any)
+
+const userLogsIndexRoute = userLogsIndexImport.update({
+  id: '/logs/',
+  path: '/logs/',
   getParentRoute: () => userRouteRoute,
 } as any)
 
@@ -156,6 +163,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof userListIndexImport
       parentRoute: typeof userListRouteImport
     }
+    '/(user)/logs/': {
+      id: '/(user)/logs/'
+      path: '/logs'
+      fullPath: '/logs'
+      preLoaderRoute: typeof userLogsIndexImport
+      parentRoute: typeof userRouteImport
+    }
     '/(user)/settings/': {
       id: '/(user)/settings/'
       path: '/settings'
@@ -217,11 +231,13 @@ const userListRouteRouteWithChildren = userListRouteRoute._addFileChildren(
 
 interface userRouteRouteChildren {
   userListRouteRoute: typeof userListRouteRouteWithChildren
+  userLogsIndexRoute: typeof userLogsIndexRoute
   userSettingsIndexRoute: typeof userSettingsIndexRoute
 }
 
 const userRouteRouteChildren: userRouteRouteChildren = {
   userListRouteRoute: userListRouteRouteWithChildren,
+  userLogsIndexRoute: userLogsIndexRoute,
   userSettingsIndexRoute: userSettingsIndexRoute,
 }
 
@@ -237,6 +253,7 @@ export interface FileRoutesByFullPath {
   '/signup': typeof authSignupRoute
   '/list/$id': typeof userListIdRouteRouteWithChildren
   '/list/': typeof userListIndexRoute
+  '/logs': typeof userLogsIndexRoute
   '/settings': typeof userSettingsIndexRoute
   '/list/$id/': typeof userListIdIndexRoute
 }
@@ -247,6 +264,7 @@ export interface FileRoutesByTo {
   '/login': typeof authLoginRoute
   '/signup': typeof authSignupRoute
   '/list': typeof userListIndexRoute
+  '/logs': typeof userLogsIndexRoute
   '/settings': typeof userSettingsIndexRoute
   '/list/$id': typeof userListIdIndexRoute
 }
@@ -262,6 +280,7 @@ export interface FileRoutesById {
   '/(auth)/signup': typeof authSignupRoute
   '/(user)/list/$id': typeof userListIdRouteRouteWithChildren
   '/(user)/list/': typeof userListIndexRoute
+  '/(user)/logs/': typeof userLogsIndexRoute
   '/(user)/settings/': typeof userSettingsIndexRoute
   '/(user)/list/$id/': typeof userListIdIndexRoute
 }
@@ -276,6 +295,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/list/$id'
     | '/list/'
+    | '/logs'
     | '/settings'
     | '/list/$id/'
   fileRoutesByTo: FileRoutesByTo
@@ -285,6 +305,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/list'
+    | '/logs'
     | '/settings'
     | '/list/$id'
   id:
@@ -298,6 +319,7 @@ export interface FileRouteTypes {
     | '/(auth)/signup'
     | '/(user)/list/$id'
     | '/(user)/list/'
+    | '/(user)/logs/'
     | '/(user)/settings/'
     | '/(user)/list/$id/'
   fileRoutesById: FileRoutesById
@@ -347,6 +369,7 @@ export const routeTree = rootRoute
       "filePath": "(user)/route.tsx",
       "children": [
         "/(user)/list",
+        "/(user)/logs/",
         "/(user)/settings/"
       ]
     },
@@ -379,6 +402,10 @@ export const routeTree = rootRoute
     "/(user)/list/": {
       "filePath": "(user)/list/index.tsx",
       "parent": "/(user)/list"
+    },
+    "/(user)/logs/": {
+      "filePath": "(user)/logs/index.tsx",
+      "parent": "/(user)"
     },
     "/(user)/settings/": {
       "filePath": "(user)/settings/index.tsx",

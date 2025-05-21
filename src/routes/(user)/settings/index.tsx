@@ -1,7 +1,10 @@
 import ActionConfirmDialog from "@/components/ActionConfirmDialog";
+import AsteriskMoneyToggle from "@/components/AsteriskMoneyToggle";
 import PageStatusSetter from "@/components/PageStatusSetter";
+import ThemeToggle from "@/components/ThemeToggle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import { createFileRoute, useNavigate, useRouteContext } from "@tanstack/react-router";
 import { Settings } from "lucide-react";
 export const Route = createFileRoute("/(user)/settings/")({
@@ -13,7 +16,7 @@ function RouteComponent() {
   const navigate = useNavigate();
 
   return (
-    <div className="flex h-full flex-col justify-between gap-8 px-4 pt-8 pb-32">
+    <div className="flex h-full flex-col gap-4 overflow-auto px-4 pt-8 pb-32">
       <div className="space-y-4">
         <div className="text-muted-foreground flex items-center gap-2 pb-4">
           <Settings />
@@ -30,27 +33,31 @@ function RouteComponent() {
           Joined at {user?.createdAt.toLocaleString()}
         </p>
       </div>
-      <div className="flex flex-col gap-4">
-        <ActionConfirmDialog
-          confirm={() => {}}
-          desc="Are you sure to permanentaly delete your account?"
-          title="Account Deletion"
-        >
-          <Button type="button" variant="destructive">
-            Delete Account
-          </Button>
-        </ActionConfirmDialog>
-        <ActionConfirmDialog
-          confirm={() => navigate({ to: "/logout" })}
-          desc="Are you sure to log out?"
-          title="Logging out"
-        >
-          <Button type="button" variant="ghost">
-            Sign out
-          </Button>
-        </ActionConfirmDialog>
-      </div>
-      <PageStatusSetter state={{ showAddMoneyBtn: false, showSettingsBtn: false }} />
+      <Separator />
+      <AsteriskMoneyToggle />
+      <ThemeToggle />
+      <Separator />
+      <ActionConfirmDialog
+        confirm={() => {}}
+        desc="Are you sure to permanentaly delete your account?"
+        title="Account Deletion"
+      >
+        <Button type="button" variant="destructive">
+          Delete Account
+        </Button>
+      </ActionConfirmDialog>
+      <ActionConfirmDialog
+        confirm={() => navigate({ to: "/logout" })}
+        desc="Are you sure to log out?"
+        title="Logging out"
+      >
+        <Button type="button" variant="ghost">
+          Sign out
+        </Button>
+      </ActionConfirmDialog>
+      <PageStatusSetter
+        state={{ showAddMoneyBtn: false, showSettingsBtn: false, showLogsPageBtn: true }}
+      />
     </div>
   );
 }
