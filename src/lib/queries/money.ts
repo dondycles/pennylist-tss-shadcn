@@ -1,10 +1,15 @@
 import { queryOptions } from "@tanstack/react-query";
 import { getMoney, getMoneys } from "../server/fn/money";
+import { ListState } from "../stores/list-state";
 
-export const moneysQueryOptions = (userId: string | undefined) =>
+export const moneysQueryOptions = (
+  userId: string | undefined,
+  listState: Pick<ListState, "flow" | "sortBy">,
+) =>
   queryOptions({
-    queryKey: ["moneys", userId ?? "no-user"],
-    queryFn: async () => await getMoneys(),
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    queryKey: ["moneys", userId ?? "no-user", listState.flow, listState.sortBy],
+    queryFn: async () => await getMoneys({ data: listState }),
   });
 
 export const moneyQueryOptions = (id: string) =>

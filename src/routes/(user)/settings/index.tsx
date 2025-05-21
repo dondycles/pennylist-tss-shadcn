@@ -1,5 +1,6 @@
 import ActionConfirmDialog from "@/components/ActionConfirmDialog";
 import AsteriskMoneyToggle from "@/components/AsteriskMoneyToggle";
+import ListSorterDropdown from "@/components/ListSorterDropdown";
 import PageStatusSetter from "@/components/PageStatusSetter";
 import ThemeToggle from "@/components/ThemeToggle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -34,6 +35,7 @@ function RouteComponent() {
         </p>
       </div>
       <Separator />
+      <ListSorterDropdown />
       <AsteriskMoneyToggle />
       <ThemeToggle />
       <Separator />

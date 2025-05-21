@@ -1,4 +1,3 @@
-import ThemeToggle from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { Link, createFileRoute } from "@tanstack/react-router";
 
@@ -54,15 +53,11 @@ function Home() {
             <Button asChild type="button" className="w-fit" variant="destructive">
               <Link to="/logout">Sign out</Link>
             </Button>
-            <ThemeToggle />
           </div>
         ) : (
-          <div className="flex items-center gap-2">
-            <Button type="button" asChild className="w-fit">
-              <Link to="/login">Log in</Link>
-            </Button>
-            <ThemeToggle />
-          </div>
+          <Button type="button" asChild className="w-fit">
+            <Link to="/login">Log in</Link>
+          </Button>
         )}
         <div className="mt-16 space-y-4 text-left">
           {features.map((f, i) => (

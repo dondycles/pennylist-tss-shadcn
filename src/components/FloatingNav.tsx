@@ -1,17 +1,17 @@
-import { usePageState } from "@/lib/stores/page-state";
+import { useFloatingNavState } from "@/lib/stores/floating-nav-state";
 import { Link } from "@tanstack/react-router";
 import { ChartGantt, ChevronLeft, Plus, Settings } from "lucide-react";
 import { motion } from "motion/react";
 import MoneyFormDialog from "./MoneyFormDialog";
 import { Button } from "./ui/button";
 export default function FloatingNav() {
-  const pageState = usePageState();
+  const floatingNavState = useFloatingNavState();
   return (
     <motion.nav
       layout
       className="bg-muted fixed bottom-4 left-1/2 z-50 flex max-h-9 w-fit max-w-4xl -translate-x-1/2 items-center justify-center gap-1 rounded-full drop-shadow-xl"
     >
-      {pageState.showAddMoneyBtn ? (
+      {floatingNavState.showAddMoneyBtn ? (
         <MoneyFormDialog
           deepView={false}
           desc="It's always nice to have new money."
@@ -33,7 +33,7 @@ export default function FloatingNav() {
         </Button>
       )}
       <Button
-        hidden={!pageState.showLogsPageBtn}
+        hidden={!floatingNavState.showLogsPageBtn}
         asChild
         type="button"
         size={"icon"}
@@ -43,7 +43,12 @@ export default function FloatingNav() {
           <ChartGantt className="size-5" />
         </Link>
       </Button>
-      <Button hidden={!pageState.showSettingsBtn} asChild size={"icon"} variant={"ghost"}>
+      <Button
+        hidden={!floatingNavState.showSettingsBtn}
+        asChild
+        size={"icon"}
+        variant={"ghost"}
+      >
         <Link to="/settings">
           <Settings className="size-5" />
         </Link>

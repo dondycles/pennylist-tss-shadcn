@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { storage } from "./storage";
 
-export type PageState = {
+export type FloatingNavState = {
   showAddMoneyBtn: boolean;
   showSettingsBtn: boolean;
   showLogsPageBtn: boolean;
@@ -17,7 +17,7 @@ export type PageState = {
   }) => void;
 };
 
-export const usePageState = create<PageState>()(
+export const useFloatingNavState = create<FloatingNavState>()(
   persist(
     (set) => ({
       showAddMoneyBtn: false,
@@ -26,7 +26,7 @@ export const usePageState = create<PageState>()(
       setState: (state) => set(() => state),
     }),
     {
-      name: "page-state",
+      name: "floating-nav-state",
       storage: createJSONStorage(() => storage),
     },
   ),

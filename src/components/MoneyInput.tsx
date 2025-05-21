@@ -1,6 +1,5 @@
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { DollarSign } from "lucide-react";
-import { Input } from "./ui/input";
 
 export default function MoneyInput({
   className,
@@ -8,9 +7,14 @@ export default function MoneyInput({
   ...props
 }: React.ComponentProps<"input">) {
   return (
-    <div className={cn("relative h-fit w-fit", className)}>
-      <Input className="indent-5" type={type} {...props} />
-      <DollarSign className="text-muted-foreground absolute top-1/2 left-px box-content size-4 -translate-y-1/2 rounded-full p-2 backdrop-blur-2xl" />
+    <div className={cn("relative", className)}>
+      <Input className="peer ps-6 pe-12" placeholder="0.00" type={type} {...props} />
+      <span className="text-muted-foreground pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 text-sm peer-disabled:opacity-50">
+        ₱
+      </span>
+      <span className="text-muted-foreground pointer-events-none absolute inset-y-0 end-0 flex items-center justify-center pe-3 text-sm peer-disabled:opacity-50">
+        PHP
+      </span>
     </div>
   );
 }

@@ -1,15 +1,20 @@
-import { PageState, usePageState } from "@/lib/stores/page-state";
-import { useEffect } from "react";
+import { FloatingNavState, useFloatingNavState } from "@/lib/stores/floating-nav-state";
+import { useEffect, useState } from "react";
 
 export default function PageStatusSetter({
   state,
 }: {
-  state: Omit<PageState, "setState">;
+  state: Omit<FloatingNavState, "setState">;
 }) {
-  const pageState = usePageState();
+  const [mounted, setMounted] = useState(false);
+  const floatingNavState = useFloatingNavState();
 
   useEffect(() => {
-    pageState.setState(state);
+    if (mounted) floatingNavState.setState(state);
+  }, [mounted]);
+
+  useEffect(() => {
+    setMounted(true);
   }, []);
   return null;
 }
