@@ -62,6 +62,9 @@ export const getMoney = createServerFn({ method: "GET" })
       return (
         (await db.query.money.findFirst({
           where: (money, { eq, and }) => and(eq(money.userId, userId), eq(money.id, id)),
+          with: {
+            logsData: true,
+          },
         })) ?? null
       );
     },

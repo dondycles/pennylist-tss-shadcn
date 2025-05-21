@@ -1,9 +1,10 @@
 import LogCard from "@/components/LogCard";
 import PageStatusSetter from "@/components/PageStatusSetter";
+import { Button } from "@/components/ui/button";
 import { logsQueryOptions } from "@/lib/queries/logs";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { ChartGantt } from "lucide-react";
+import { ChartGantt, RefreshCw } from "lucide-react";
 import { Suspense } from "react";
 
 export const Route = createFileRoute("/(user)/logs/")({
@@ -17,9 +18,14 @@ function RouteComponent() {
   return (
     <div className="flex h-full flex-col justify-between gap-8 pt-8 pb-32">
       <div className="space-y-4">
-        <div className="text-muted-foreground flex items-center gap-2 px-4 pb-4">
-          <ChartGantt />
-          <p>Logs</p>
+        <div className="text-muted-foreground flex items-start justify-between gap-4 px-4 pb-4">
+          <div className="flex items-center gap-2">
+            <ChartGantt />
+            <p>Logs</p>
+          </div>
+          <Button onClick={() => location.reload()} size="icon" variant={"ghost"}>
+            <RefreshCw />
+          </Button>
         </div>
         <Suspense
           fallback={
