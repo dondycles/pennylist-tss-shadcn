@@ -11,11 +11,11 @@ import { Suspense } from "react";
 
 export const Route = createFileRoute("/(user)/list/")({
   component: RouteComponent,
-  loader: ({ context }) => {
-    context.queryClient.prefetchQuery(
-      moneysQueryOptions(context.user?.id, { flow: "desc", sortBy: "date" }),
-    );
-  },
+  // loader: ({ context }) => {
+  //   context.queryClient.prefetchQuery(
+  //     moneysQueryOptions(context.user?.id, { flow: "desc", sortBy: "date" }),
+  //   );
+  // },
 });
 function RouteComponent() {
   return (
@@ -38,6 +38,7 @@ function Moneys() {
   const { user, queryClient } = Route.useRouteContext();
   const { total } = useMoneyState();
   const listState = useListState();
+  // change settings to be saved in database as well
   const moneys = useSuspenseQuery(moneysQueryOptions(user?.id, listState));
   return (
     <div className="pb-32">
