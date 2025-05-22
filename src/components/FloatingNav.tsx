@@ -1,6 +1,6 @@
 import { useFloatingNavState } from "@/lib/stores/floating-nav-state";
 import { Link } from "@tanstack/react-router";
-import { ChartGantt, ChevronLeft, Plus, Settings } from "lucide-react";
+import { Activity, ChartGantt, ChevronLeft, Plus, Settings } from "lucide-react";
 import { motion } from "motion/react";
 import MoneyFormDialog from "./MoneyFormDialog";
 import { Button } from "./ui/button";
@@ -41,6 +41,17 @@ export default function FloatingNav() {
       >
         <Link to="/logs">
           <ChartGantt className="size-5" />
+        </Link>
+      </Button>
+      <Button
+        hidden={!floatingNavState.showAnalyticsPageBtn}
+        asChild
+        type="button"
+        size={"icon"}
+        variant={"ghost"}
+      >
+        <Link to="/analytics">
+          <Activity className="size-5" />
         </Link>
       </Button>
       <Button

@@ -21,6 +21,7 @@ import { Route as userListRouteImport } from './routes/(user)/list/route'
 import { Route as userSettingsIndexImport } from './routes/(user)/settings/index'
 import { Route as userLogsIndexImport } from './routes/(user)/logs/index'
 import { Route as userListIndexImport } from './routes/(user)/list/index'
+import { Route as userAnalyticsIndexImport } from './routes/(user)/analytics/index'
 import { Route as userListIdRouteImport } from './routes/(user)/list/$id/route'
 import { Route as userListIdIndexImport } from './routes/(user)/list/$id/index'
 
@@ -82,6 +83,12 @@ const userListIndexRoute = userListIndexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => userListRouteRoute,
+} as any)
+
+const userAnalyticsIndexRoute = userAnalyticsIndexImport.update({
+  id: '/analytics/',
+  path: '/analytics/',
+  getParentRoute: () => userRouteRoute,
 } as any)
 
 const userListIdRouteRoute = userListIdRouteImport.update({
@@ -155,6 +162,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/list/$id'
       preLoaderRoute: typeof userListIdRouteImport
       parentRoute: typeof userListRouteImport
+    }
+    '/(user)/analytics/': {
+      id: '/(user)/analytics/'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof userAnalyticsIndexImport
+      parentRoute: typeof userRouteImport
     }
     '/(user)/list/': {
       id: '/(user)/list/'
@@ -231,12 +245,14 @@ const userListRouteRouteWithChildren = userListRouteRoute._addFileChildren(
 
 interface userRouteRouteChildren {
   userListRouteRoute: typeof userListRouteRouteWithChildren
+  userAnalyticsIndexRoute: typeof userAnalyticsIndexRoute
   userLogsIndexRoute: typeof userLogsIndexRoute
   userSettingsIndexRoute: typeof userSettingsIndexRoute
 }
 
 const userRouteRouteChildren: userRouteRouteChildren = {
   userListRouteRoute: userListRouteRouteWithChildren,
+  userAnalyticsIndexRoute: userAnalyticsIndexRoute,
   userLogsIndexRoute: userLogsIndexRoute,
   userSettingsIndexRoute: userSettingsIndexRoute,
 }
@@ -252,6 +268,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof authLoginRoute
   '/signup': typeof authSignupRoute
   '/list/$id': typeof userListIdRouteRouteWithChildren
+  '/analytics': typeof userAnalyticsIndexRoute
   '/list/': typeof userListIndexRoute
   '/logs': typeof userLogsIndexRoute
   '/settings': typeof userSettingsIndexRoute
@@ -263,6 +280,7 @@ export interface FileRoutesByTo {
   '/logout': typeof LogoutRoute
   '/login': typeof authLoginRoute
   '/signup': typeof authSignupRoute
+  '/analytics': typeof userAnalyticsIndexRoute
   '/list': typeof userListIndexRoute
   '/logs': typeof userLogsIndexRoute
   '/settings': typeof userSettingsIndexRoute
@@ -279,6 +297,7 @@ export interface FileRoutesById {
   '/(auth)/login': typeof authLoginRoute
   '/(auth)/signup': typeof authSignupRoute
   '/(user)/list/$id': typeof userListIdRouteRouteWithChildren
+  '/(user)/analytics/': typeof userAnalyticsIndexRoute
   '/(user)/list/': typeof userListIndexRoute
   '/(user)/logs/': typeof userLogsIndexRoute
   '/(user)/settings/': typeof userSettingsIndexRoute
@@ -294,6 +313,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/list/$id'
+    | '/analytics'
     | '/list/'
     | '/logs'
     | '/settings'
@@ -304,6 +324,7 @@ export interface FileRouteTypes {
     | '/logout'
     | '/login'
     | '/signup'
+    | '/analytics'
     | '/list'
     | '/logs'
     | '/settings'
@@ -318,6 +339,7 @@ export interface FileRouteTypes {
     | '/(auth)/login'
     | '/(auth)/signup'
     | '/(user)/list/$id'
+    | '/(user)/analytics/'
     | '/(user)/list/'
     | '/(user)/logs/'
     | '/(user)/settings/'
@@ -369,6 +391,7 @@ export const routeTree = rootRoute
       "filePath": "(user)/route.tsx",
       "children": [
         "/(user)/list",
+        "/(user)/analytics/",
         "/(user)/logs/",
         "/(user)/settings/"
       ]
@@ -398,6 +421,10 @@ export const routeTree = rootRoute
       "children": [
         "/(user)/list/$id/"
       ]
+    },
+    "/(user)/analytics/": {
+      "filePath": "(user)/analytics/index.tsx",
+      "parent": "/(user)"
     },
     "/(user)/list/": {
       "filePath": "(user)/list/index.tsx",

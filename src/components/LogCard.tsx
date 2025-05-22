@@ -44,7 +44,7 @@ export default function LogCard({ log }: { log: Logs[number] }) {
   } = getDiff("totalMoney");
 
   return (
-    <div key={log.id} className="w-full py-4 not-last:border-b">
+    <div key={log.id} className="w-full pb-4 not-first:pt-4 not-last:border-b">
       {/* <pre>{log.moneyId}</pre>
       <pre>{JSON.stringify(log.transferDetails, null, 2)}</pre> */}
       <div className="w-full px-4">
@@ -65,7 +65,7 @@ export default function LogCard({ log }: { log: Logs[number] }) {
           <p className="text-sm">{log.createdAt?.toLocaleDateString()}</p>
         </div>
         {!isReceiver && log.transferDetails ? (
-          <div className="bg-muted mt-4 rounded-3xl p-4">
+          <div className="bg-muted/50 mt-4 rounded-3xl p-4">
             <p className="text-muted-foreground text-sm">Receivers</p>
             <Table>
               <TableHeader>
@@ -81,7 +81,11 @@ export default function LogCard({ log }: { log: Logs[number] }) {
                     style={{ color: r.color ?? "var(--foreground)" }}
                     key={`receiver-${r.id}`}
                   >
-                    <TableCell className="font-medium">{r.name}</TableCell>
+                    <TableCell className="font-medium">
+                      <Link to="/list/$id" params={{ id: r.id as string }}>
+                        {r.name}
+                      </Link>
+                    </TableCell>
                     <TableCell>
                       {" "}
                       <Amount
@@ -159,7 +163,7 @@ function Data({
   return (
     <div
       style={{ color: data.color ?? "var(--foreground)" }}
-      className="bg-muted truncate rounded-3xl p-4"
+      className="bg-muted/50 truncate rounded-3xl p-4"
     >
       <p className="text-muted-foreground text-sm">{title}</p>
       <p className="font-bold">{data.name}</p>

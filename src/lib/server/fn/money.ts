@@ -1,5 +1,4 @@
 import { authMiddleware } from "@/lib/middleware/auth-guard";
-import { ListState } from "@/lib/stores/list-state";
 import { createServerFn } from "@tanstack/react-start";
 import { and, eq } from "drizzle-orm";
 import _ from "lodash";
@@ -7,6 +6,7 @@ import z from "zod";
 import { db } from "../db";
 import { money } from "../schema/money.schema";
 import { addLog } from "./logs";
+import { getUserSettings } from "./user";
 
 export const moneySchema = z.object({
   name: z.string().min(1),
@@ -31,14 +31,15 @@ export const editMoneySchema = z.object({
 });
 export const getMoneys = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
-  .validator((data: Pick<ListState, "flow" | "sortBy">) => data)
   .handler(
     async ({
-      data: { flow, sortBy },
       context: {
         user: { id: userId },
       },
     }) => {
+      const settings = await getUserSettings();
+      const flow = settings?.settings?.flow ?? "desc";
+      const sortBy = settings?.settings?.sortBy ?? "date";
       return await db.query.money.findMany({
         where: (money, { eq }) => eq(money.userId, userId),
         orderBy: (money, { asc, desc }) =>

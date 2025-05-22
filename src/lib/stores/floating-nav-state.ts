@@ -6,14 +6,17 @@ export type FloatingNavState = {
   showAddMoneyBtn: boolean;
   showSettingsBtn: boolean;
   showLogsPageBtn: boolean;
+  showAnalyticsPageBtn: boolean;
   setState: ({
     showAddMoneyBtn,
     showSettingsBtn,
     showLogsPageBtn,
+    showAnalyticsPageBtn,
   }: {
     showAddMoneyBtn: boolean;
     showSettingsBtn: boolean;
     showLogsPageBtn: boolean;
+    showAnalyticsPageBtn: boolean;
   }) => void;
 };
 
@@ -23,6 +26,7 @@ export const useFloatingNavState = create<FloatingNavState>()(
       showAddMoneyBtn: false,
       showSettingsBtn: false,
       showLogsPageBtn: false,
+      showAnalyticsPageBtn: false,
       setState: (state) => set(() => state),
     }),
     {

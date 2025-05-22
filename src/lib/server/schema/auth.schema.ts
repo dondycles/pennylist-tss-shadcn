@@ -1,4 +1,4 @@
-import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -8,6 +8,19 @@ export const user = pgTable("user", {
   image: text("image"),
   createdAt: timestamp("created_at").notNull(),
   updatedAt: timestamp("updated_at").notNull(),
+  settings: jsonb("settings")
+    .$type<{
+      flow: "asc" | "desc";
+      sortBy: "date" | "amount";
+      asteriskMoney: boolean;
+      theme: "light" | "dark";
+    }>()
+    .$default(() => ({
+      flow: "desc",
+      sortBy: "date",
+      asteriskMoney: false,
+      theme: "light",
+    })),
 });
 
 export const session = pgTable("session", {

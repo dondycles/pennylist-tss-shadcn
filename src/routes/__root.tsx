@@ -10,6 +10,7 @@ import {
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
+import { userQueryOptions } from "@/lib/queries/user";
 import { getUser } from "@/lib/server/fn/user";
 import appCss from "@/lib/styles/app.css?url";
 
@@ -18,10 +19,7 @@ export const Route = createRootRouteWithContext<{
   user: Awaited<ReturnType<typeof getUser>>;
 }>()({
   beforeLoad: async ({ context }) => {
-    const user = await context.queryClient.fetchQuery({
-      queryKey: ["user"],
-      queryFn: ({ signal }) => getUser({ signal }),
-    }); // we're using react-query for caching, see router.tsx
+    const user = await context.queryClient.fetchQuery(userQueryOptions()); // we're using react-query for caching, see router.tsx
     return { user };
   },
   head: () => ({
