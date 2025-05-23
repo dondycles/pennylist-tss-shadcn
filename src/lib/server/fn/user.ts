@@ -10,7 +10,6 @@ export const getUser = createServerFn({ method: "GET" }).handler(async () => {
   if (!user) {
     return null;
   }
-
   return {
     email: user.email,
     id: user.id,
@@ -28,13 +27,9 @@ export const getUserSettings = createServerFn({ method: "GET" })
       },
     }) => {
       const supabase = getSupabaseServerClient();
-      const { data, error } = await supabase
-        .from("setting")
-        .select()
-        .eq("userId", id)
-        .single();
-      if (error) throw new Error(error.message);
-      return data;
+      const { data, error } = await supabase.from("setting").select().eq("userId", id);
+      if (error) throw new Error(JSON.stringify(error, null, 2));
+      return data[0];
     },
   );
 
@@ -59,8 +54,9 @@ export const updateUserSettings = createServerFn({ method: "POST" })
           sortBy: data.sortBy,
           theme: data.theme,
           id: id,
+          updated_at: new Date().toISOString(),
         })
         .eq("userId", id);
-      if (error) throw new Error(error.message);
+      if (error) throw new Error(JSON.stringify(error, null, 2));
     },
   );

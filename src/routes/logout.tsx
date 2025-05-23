@@ -1,8 +1,13 @@
-import authClient from "@/lib/auth-client";
+import { getSupabaseServerClient } from "@/lib/server/supabase";
 import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
 import { Loader2 } from "lucide-react";
 import { useEffect } from "react";
-
+export const logoutFn = createServerFn({ method: "POST" }).handler(async () => {
+  const supabase = getSupabaseServerClient();
+  const { error } = await supabase.auth.signOut();
+  if (error) throw new Error(error.message);
+});
 export const Route = createFileRoute("/logout")({
   beforeLoad: async ({ context }) => {
     if (!context.user) {
@@ -18,7 +23,7 @@ function RouteComponent() {
   const router = useRouter();
   useEffect(() => {
     const logOut = async () => {
-      await authClient.signOut();
+      await logoutFn();
       await queryClient.invalidateQueries({ queryKey: ["user"] });
       await router.invalidate();
     };

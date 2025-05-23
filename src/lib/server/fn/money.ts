@@ -1,4 +1,5 @@
 import { authMiddleware } from "@/lib/middleware/auth-guard";
+import { settingMiddleware } from "@/lib/middleware/setting-guard";
 import { createServerFn } from "@tanstack/react-start";
 import _ from "lodash";
 import z from "zod";
@@ -27,20 +28,33 @@ export const editMoneySchema = z.object({
   reason: z.string().optional().nullable(),
 });
 export const getMoneys = createServerFn({ method: "GET" })
-  .middleware([authMiddleware])
+  .middleware([authMiddleware, settingMiddleware])
   .handler(
     async ({
       context: {
         user: { id: userId },
+        setting,
       },
     }) => {
       const supabase = getSupabaseServerClient();
-      const { data, error } = await supabase
-        .from("money")
-        .select()
-        .eq("userId", userId)
-        .order("created_at", { ascending: false });
-      if (error) throw new Error(error.message);
+      let query = supabase.from("money").select().eq("userId", userId);
+      if (!setting) {
+        query = query.order("created_at", {
+          ascending: false,
+        });
+      } else {
+        if (setting.sortBy === "amount") {
+          query = query.order("amount", {
+            ascending: setting.flow === "asc" ? true : false,
+          });
+        } else {
+          query = query.order("created_at", {
+            ascending: setting.flow === "asc" ? true : false,
+          });
+        }
+      }
+      const { data, error } = await query;
+      if (error) throw new Error(JSON.stringify(error, null, 2));
       return data;
     },
   );
@@ -62,7 +76,8 @@ export const getMoney = createServerFn({ method: "GET" })
         .eq("userId", userId)
         .eq("id", id)
         .single();
-      if (error) throw new Error(error.message);
+      if (error) throw new Error(JSON.stringify(error, null, 2));
+
       return data;
     },
   );
@@ -81,7 +96,8 @@ export const addMoney = createServerFn({ method: "POST" })
       })
       .select()
       .single();
-    if (error) throw new Error(error.message);
+    if (error) throw new Error(JSON.stringify(error, null, 2));
+
     if (insteredMoneyData)
       await addLog({
         data: {
@@ -112,7 +128,8 @@ export const editMoney = createServerFn({ method: "POST" })
       })
       .eq("id", current.id)
       .eq("userId", user.id);
-    if (error) throw new Error(error.message);
+    if (error) throw new Error(JSON.stringify(error, null, 2));
+
     await addLog({
       data: {
         changes: {
@@ -139,7 +156,8 @@ export const deleteMoney = createServerFn({ method: "POST" })
       .delete()
       .eq("id", moneyData.id)
       .eq("userId", user.id);
-    if (error) throw new Error(error.message);
+    if (error) throw new Error(JSON.stringify(error, null, 2));
+
     await addLog({
       data: {
         changes: {
@@ -174,7 +192,8 @@ export const transferMoneys = createServerFn({ method: "POST" })
       })
       .eq("id", sender.id)
       .eq("userId", user.id);
-    if (error) throw new Error(error.message);
+    if (error) throw new Error(JSON.stringify(error, null, 2));
+
     await addLog({
       data: {
         changes: {
@@ -205,7 +224,8 @@ export const transferMoneys = createServerFn({ method: "POST" })
         })
         .eq("id", receiver.id)
         .eq("userId", user.id);
-      if (error) throw new Error(error.message);
+      if (error) throw new Error(JSON.stringify(error, null, 2));
+
       await addLog({
         data: {
           changes: {

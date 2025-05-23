@@ -1,4 +1,4 @@
-import { useEffect, useId } from "react";
+import { useId } from "react";
 
 import { Label } from "@/components/ui/label";
 import {
@@ -53,6 +53,23 @@ function RouteComponent() {
   const { asterisk, setAsterisk } = useMoneyState();
   const { flow, sortBy, setState } = useListState();
 
+  const handleUpdateUserSettings = useMutation({
+    mutationFn: (
+      data: Pick<ListState, "flow" | "sortBy"> & {
+        theme: "dark" | "light";
+        asterisk: boolean;
+      },
+    ) => {
+      return updateUserSettings({
+        data,
+      });
+    },
+    onSuccess: () => {
+      settings.refetch();
+      queryClient.invalidateQueries({ queryKey: ["moneys", user?.id] });
+    },
+  });
+
   function toggleTheme() {
     if (
       document.documentElement.classList.contains("dark") ||
@@ -62,33 +79,14 @@ function RouteComponent() {
       document.documentElement.classList.remove("dark");
       localStorage.theme = "light";
       setTheme("light");
+      handleUpdateUserSettings.mutate({ asterisk, flow, sortBy, theme: "light" });
     } else {
       document.documentElement.classList.add("dark");
       localStorage.theme = "dark";
       setTheme("dark");
+      handleUpdateUserSettings.mutate({ asterisk, flow, sortBy, theme: "dark" });
     }
   }
-
-  const handleUpdateUserSettings = useMutation({
-    mutationFn: () => {
-      return updateUserSettings({
-        data: {
-          asterisk,
-          flow,
-          sortBy,
-          theme,
-        },
-      });
-    },
-    onSuccess: () => {
-      settings.refetch();
-      queryClient.invalidateQueries({ queryKey: ["moneys", user?.id] });
-    },
-  });
-
-  useEffect(() => {
-    handleUpdateUserSettings.mutate();
-  }, [asterisk, flow, sortBy, theme]);
 
   return (
     <div className="flex h-full flex-col gap-4 pt-4 pb-32">
@@ -104,7 +102,10 @@ function RouteComponent() {
         <p className="truncate text-2xl font-bold sm:text-4xl">{user?.email}</p>
       </div>
       <p className="text-muted-foreground px-4">
-        Joined at {user?.createdAt.toLocaleString()}
+        Joined at {new Date(user?.createdAt ?? new Date()).toLocaleString()}
+      </p>
+      <p className="text-muted-foreground px-4">
+        Last update at {new Date(settings.data.updated_at ?? new Date()).toLocaleString()}
       </p>
       <Separator />
       <div className="space-y-4 px-4">
@@ -118,6 +119,7 @@ function RouteComponent() {
                 sortBy: settings.data.sortBy ?? sortBy,
                 setState: (state) => {
                   setState(state);
+                  handleUpdateUserSettings.mutate({ ...state, asterisk, theme });
                 },
               }}
               id={id}
@@ -131,7 +133,10 @@ function RouteComponent() {
               pending={handleUpdateUserSettings.isPending}
               id={id}
               checked={settings.data.asterisk ?? asterisk}
-              onCheckedChange={setAsterisk}
+              onCheckedChange={(asterisk) => {
+                setAsterisk(asterisk);
+                handleUpdateUserSettings.mutate({ asterisk, theme, flow, sortBy });
+              }}
               checkedIcon={<Eye size={16} aria-hidden="true" />}
               uncheckedIcon={<EyeClosed size={16} aria-hidden="true" />}
             />
@@ -143,7 +148,7 @@ function RouteComponent() {
             <SwitcherComponent
               pending={handleUpdateUserSettings.isPending}
               id={id}
-              checked={settings.data.theme === "dark" || theme === "dark"}
+              checked={settings.data.theme === "light" || theme === "light"}
               onCheckedChange={toggleTheme}
               checkedIcon={<MoonIcon size={16} aria-hidden="true" />}
               uncheckedIcon={<SunIcon size={16} aria-hidden="true" />}

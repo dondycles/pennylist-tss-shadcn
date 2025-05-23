@@ -3,16 +3,11 @@ import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 export const Route = createFileRoute("/(auth)")({
   component: RouteComponent,
   beforeLoad: async ({ context }) => {
-    const REDIRECT_URL = "/list";
     if (context.user) {
       throw redirect({
-        to: REDIRECT_URL,
+        to: "/list",
       });
     }
-    return {
-      redirectUrl: REDIRECT_URL,
-      user: context.user,
-    };
   },
 });
 

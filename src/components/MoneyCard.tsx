@@ -84,12 +84,7 @@ export default function MoneyCard({
       />
       <ScrollArea>
         <div className="mt-4 flex overflow-auto">
-          <Link
-            hidden={deepView}
-            to="/list/$id"
-            params={{ id: m.id }}
-            search={{ data: m }}
-          >
+          <Link hidden={deepView} to="/list/$id" params={{ id: m.id }}>
             <Button size={"icon"} variant={"ghost"}>
               <ExternalLink className="size-4" />
             </Button>

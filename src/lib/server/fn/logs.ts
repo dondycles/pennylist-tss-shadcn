@@ -46,7 +46,7 @@ export const addLog = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const supabase = getSupabaseServerClient();
     const { error } = await supabase.from("log").insert(data);
-    if (error) throw new Error(error.message);
+    if (error) throw new Error(JSON.stringify(error, null, 2));
   });
 
 export const getLogs = createServerFn({ method: "GET" })
@@ -58,6 +58,7 @@ export const getLogs = createServerFn({ method: "GET" })
       .select("*, money(*)")
       .eq("userId", user.id)
       .order("created_at", { ascending: false });
-    if (error) throw new Error(error.message);
+    if (error) throw new Error(JSON.stringify(error, null, 2));
+
     return data;
   });

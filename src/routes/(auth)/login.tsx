@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { getSupabaseServerClient } from "@/lib/server/supabase";
-import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { LoaderCircle } from "lucide-react";
@@ -28,26 +27,12 @@ export const loginFn = createServerFn({ method: "POST" })
       };
     }
   });
+
 function LoginForm() {
-  const { redirectUrl } = Route.useRouteContext();
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-
-  const loginMutation = useMutation({
-    mutationFn: (data: { email: string; password: string }) => loginFn({ data }),
-    onSuccess: async (e) => {
-      if (e) {
-        setIsLoading(false);
-        setErrorMessage(e.message);
-        return;
-      }
-      await router.invalidate();
-      router.navigate({ to: redirectUrl });
-    },
-  });
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const router = useRouter();
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (isLoading) return;
 
@@ -57,7 +42,15 @@ function LoginForm() {
     if (!email || !password) return;
     setIsLoading(true);
     setErrorMessage("");
-    loginMutation.mutate({ email, password });
+
+    const data = await loginFn({ data: { email, password } });
+    if (!data) {
+      router.invalidate();
+      window.location.reload();
+      return;
+    }
+    setIsLoading(false);
+    setErrorMessage(data.message);
   };
 
   return (
