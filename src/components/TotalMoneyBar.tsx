@@ -42,7 +42,7 @@ export default function TotalMoneyBar() {
 
   return (
     <div
-      className={`bg-background w-full rounded-b-3xl px-4 ${sender ? "pt-8 pb-4" : "py-8"} text-center shadow-xl dark:bg-neutral-900`}
+      className={`bg-background w-full rounded-b-3xl p-4 text-center shadow-xl dark:bg-neutral-900`}
     >
       {sender ? (
         <>
@@ -109,7 +109,7 @@ export default function TotalMoneyBar() {
         <div className="space-y-1">
           <p className="text-muted-foreground">Total money</p>
           <Amount
-            className="truncate text-4xl font-bold"
+            className="mx-auto truncate text-4xl font-bold"
             amount={total}
             settings={{ sign: true }}
           />

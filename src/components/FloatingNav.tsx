@@ -1,6 +1,6 @@
 import { useFloatingNavState } from "@/lib/stores/floating-nav-state";
 import { Link } from "@tanstack/react-router";
-import { Activity, ChartGantt, ChevronLeft, Plus, Settings } from "lucide-react";
+import { Activity, ChevronLeft, FileClock, Plus, Settings } from "lucide-react";
 import { motion } from "motion/react";
 import MoneyFormDialog from "./MoneyFormDialog";
 import { Button } from "./ui/button";
@@ -40,7 +40,7 @@ export default function FloatingNav() {
         variant={"ghost"}
       >
         <Link to="/logs">
-          <ChartGantt className="size-5" />
+          <FileClock className="size-5" />
         </Link>
       </Button>
       <Button

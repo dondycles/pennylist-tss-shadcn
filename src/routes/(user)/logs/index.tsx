@@ -3,7 +3,7 @@ import PageStatusSetter from "@/components/PageStatusSetter";
 import { logsQueryOptions } from "@/lib/queries/logs";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { ChartGantt, RefreshCw } from "lucide-react";
+import { FileClock, RefreshCw } from "lucide-react";
 import { Suspense } from "react";
 
 export const Route = createFileRoute("/(user)/logs/")({
@@ -18,7 +18,7 @@ function RouteComponent() {
     <div className="flex h-full flex-col gap-4 pt-4 pb-32">
       <div className="text-muted-foreground flex items-center justify-between gap-4 border-b px-4 pb-4">
         <div className="flex items-center gap-2">
-          <ChartGantt />
+          <FileClock />
           <p>Logs</p>
         </div>
         <button onClick={() => location.reload()} type="button">
