@@ -66,7 +66,9 @@ function RouteComponent() {
           placeholder="Search"
         />
       </div>
-      <Suspense>
+      <Suspense
+        fallback={<p className="text-muted-foreground text-center">Getting logs...</p>}
+      >
         <Logs />
       </Suspense>
       <PageStatusSetter
@@ -94,6 +96,13 @@ function Logs() {
   );
   return (
     <div className="pb-32">
+      {search.q ? (
+        !logs.data.length ? (
+          <p className="text-muted-foreground text-center">No results for '{search.q}'</p>
+        ) : (
+          <p className="text-muted-foreground text-center">Results for '{search.q}'</p>
+        )
+      ) : null}
       {logs.data.map((log) => (
         <LogCard log={log} key={log.id} />
       ))}
