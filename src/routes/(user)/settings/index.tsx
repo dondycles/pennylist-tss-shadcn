@@ -6,9 +6,11 @@ import {
   ArrowUp,
   Calendar,
   ChevronDownIcon,
+  ClockPlus,
   DollarSign,
   Eye,
   EyeClosed,
+  History,
   MoonIcon,
   SunIcon,
   User2,
@@ -24,6 +26,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/animate-ui/radix/dropdown-menu";
 import PageStatusSetter from "@/components/PageStatusSetter";
+import TimeInfo from "@/components/TimeInfo";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
@@ -98,11 +101,18 @@ function RouteComponent() {
         <p className="truncate text-2xl font-bold sm:text-4xl">{user?.email}</p>
       </div>
       <div className="text-muted-foreground space-y-1 px-4 text-sm">
-        <p>Joined at {new Date(user?.createdAt ?? new Date()).toLocaleString()}</p>
-        <p>
-          Last update at{" "}
-          {new Date(settings.data.updated_at ?? new Date()).toLocaleString()}
-        </p>
+        <div>
+          <span>Joined </span>
+          <TimeInfo createdAt={user?.createdAt ?? new Date().toLocaleString()} />{" "}
+          <ClockPlus className="inline size-4" />
+        </div>
+        <div>
+          <span>Last update </span>
+          <TimeInfo
+            createdAt={settings.data.updated_at ?? new Date().toLocaleString()}
+          />{" "}
+          <History className="inline size-4" />
+        </div>
       </div>
 
       <Separator />

@@ -82,6 +82,22 @@ export const getMoney = createServerFn({ method: "GET" })
     },
   );
 
+export const getMoneyIds = createServerFn({ method: "GET" })
+  .middleware([authMiddleware])
+  .handler(
+    async ({
+      context: {
+        user: { id: userId },
+      },
+      data: id,
+    }) => {
+      const supabase = getSupabaseServerClient();
+      const { data, error } = await supabase.from("money").select().eq("userId", userId);
+      if (error) throw new Error(JSON.stringify(error, null, 2));
+      return data;
+    },
+  );
+
 export const addMoney = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .validator(moneySchema.extend({ totalMoney: z.coerce.number().nonnegative() }))

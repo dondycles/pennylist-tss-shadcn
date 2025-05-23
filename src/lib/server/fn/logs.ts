@@ -73,13 +73,13 @@ export const getLogs = createServerFn({ method: "GET" })
       .range(page * 4, page * 4 + 3);
 
     if (q) {
-      query = query.ilike("type", `%${q}%`);
+      query = query.ilike("reason", `%${q}%`);
     }
     if (type) {
       query = query.ilike("type", `%${type}%`);
     }
     if (money) {
-      query = query.ilike("money.name", `%${money}%`);
+      query = query.eq("moneyId", money);
     }
 
     const { data, error } = await query;

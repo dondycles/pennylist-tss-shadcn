@@ -1,13 +1,15 @@
 import LogCard from "@/components/LogCard";
 import PageStatusSetter from "@/components/PageStatusSetter";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import useAutoLoadNextPage from "@/lib/hooks/use-auto-reload-infinite-q";
 import { logsQueryOptions } from "@/lib/queries/logs";
+import { moneyIdsQueryOptions } from "@/lib/queries/money";
 import { debounce } from "@tanstack/pacer";
-import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
-import { FileClock, RefreshCw } from "lucide-react";
+import { useSuspenseInfiniteQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { FileClock, RefreshCw, X } from "lucide-react";
 import React, { Suspense } from "react";
 export const Route = createFileRoute("/(user)/logs/")({
   component: RouteComponent,
@@ -30,6 +32,7 @@ export const Route = createFileRoute("/(user)/logs/")({
         q: context.search.q,
       }),
     );
+    await context.queryClient.prefetchQuery(moneyIdsQueryOptions(context.user?.id));
   },
 });
 
@@ -42,7 +45,7 @@ function RouteComponent() {
   } = Route.useRouteContext();
   const debouncedSearch = debounce(
     async (searchTerm: string) => {
-      await navigate({ to: "/logs", search: { q: searchTerm } });
+      await navigate({ to: "/logs", search: { q: searchTerm, flow, money, type } });
       await queryClient.invalidateQueries({
         queryKey: ["logs", user?.id, flow, type, money, q],
       });
@@ -69,6 +72,11 @@ function RouteComponent() {
         />
       </div>
       <Suspense
+        fallback={<p className="text-muted-foreground text-center">Getting moneys...</p>}
+      >
+        <MoneyIds />
+      </Suspense>
+      <Suspense
         fallback={<p className="text-muted-foreground text-center">Getting logs...</p>}
       >
         <Logs />
@@ -81,6 +89,37 @@ function RouteComponent() {
           showAnalyticsPageBtn: true,
         }}
       />
+    </div>
+  );
+}
+
+function MoneyIds() {
+  const { search, user } = Route.useRouteContext();
+  const moneyIds = useSuspenseQuery(moneyIdsQueryOptions(user?.id));
+  return (
+    <div className="flex flex-wrap gap-2 px-4">
+      {moneyIds.data.map((money) => (
+        <Link
+          key={money.id}
+          to="/logs"
+          search={{ money: money.id === search.money ? "" : money.id }}
+        >
+          <Badge
+            style={{
+              color: money.color ?? "var(--foreground)",
+              borderColor:
+                money.color === "var(--foreground)"
+                  ? "var(--muted)"
+                  : money.color || "var(--muted)",
+            }}
+            variant={search.money === money.id ? "secondary" : "outline"}
+            className="min-w-16 rounded-3xl text-sm"
+          >
+            {money.name}
+            {money.id === search.money ? <X /> : null}
+          </Badge>
+        </Link>
+      ))}
     </div>
   );
 }

@@ -32,5 +32,5 @@ export default function TimeInfo({ createdAt }: { createdAt: string }) {
     }
     return `${monthNames[getMonth(createdAt)]} ${getDay(createdAt)} ${getYear(createdAt) !== getYear(new Date()) ? getYear(createdAt) : ""} at ${new Date(createdAt).toLocaleTimeString()}`;
   };
-  return <p className="text-muted-foreground">{getDiff()}</p>;
+  return <span className="text-muted-foreground">{getDiff()}</span>;
 }
