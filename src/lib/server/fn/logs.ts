@@ -51,14 +51,35 @@ export const addLog = createServerFn({ method: "POST" })
 
 export const getLogs = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
-  .handler(async ({ context: { user } }) => {
+  .validator(
+    (data: {
+      flow?: "asc" | "desc";
+      type?: "add" | "edit" | "delete" | "transfer";
+      money?: string;
+      q?: string;
+    }) => data,
+  )
+  .handler(async ({ context: { user }, data: { flow, type, money, q } }) => {
     const supabase = getSupabaseServerClient();
-    const { data, error } = await supabase
+    let query = supabase
       .from("log")
-      .select("*, money(*)")
+      .select("*, money!inner(*)")
       .eq("userId", user.id)
-      .order("created_at", { ascending: false });
-    if (error) throw new Error(JSON.stringify(error, null, 2));
+      .order("created_at", {
+        ascending: flow === "asc" ? true : false,
+      });
 
+    if (q) {
+      query = query.ilike("type", `%${q}%`);
+    }
+    if (type) {
+      query = query.ilike("type", `%${type}%`);
+    }
+    if (money) {
+      query = query.ilike("money.name", `%${money}%`);
+    }
+
+    const { data, error } = await query;
+    if (error) throw new Error(JSON.stringify(error, null, 2));
     return data;
   });

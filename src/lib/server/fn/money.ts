@@ -32,12 +32,12 @@ export const getMoneys = createServerFn({ method: "GET" })
   .handler(
     async ({
       context: {
-        user: { id: userId },
+        user: { id },
         setting,
       },
     }) => {
       const supabase = getSupabaseServerClient();
-      let query = supabase.from("money").select().eq("userId", userId);
+      let query = supabase.from("money").select().eq("userId", id);
       if (!setting) {
         query = query.order("created_at", {
           ascending: false,
