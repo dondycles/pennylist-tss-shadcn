@@ -1,4 +1,4 @@
-import { Money } from "@/lib/server/fn/money";
+import { Database } from "@/lib/server/supabase/types";
 import { useState } from "react";
 import {
   Dialog,
@@ -19,7 +19,7 @@ export default function MoneyFormDialog({
   title: string;
   desc: string;
   children: React.ReactNode;
-  initialData?: Money;
+  initialData?: Database["public"]["Tables"]["money"]["Row"];
   deepView: boolean;
 }) {
   const [open, setOpen] = useState(false);

@@ -10,11 +10,5 @@ export const userQueryOptions = () =>
 export const userSettingsQueryOptions = () =>
   queryOptions({
     queryKey: ["user-settings"],
-    queryFn: async ({ signal }) => {
-      const settings = await getUserSettings({ signal });
-      if (!settings) {
-        throw new Error("User settings not found");
-      }
-      return settings;
-    },
+    queryFn: async ({ signal }) => await getUserSettings({ signal }),
   });

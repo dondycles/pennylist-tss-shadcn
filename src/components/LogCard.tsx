@@ -7,14 +7,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Logs } from "@/lib/server/fn/logs";
-import { log } from "@/lib/server/schema";
+import { Changes, Database } from "@/lib/server/supabase/types";
 import { Link } from "@tanstack/react-router";
 import _ from "lodash";
 import { ArrowDownIcon, ArrowUpIcon, Banknote, Clock } from "lucide-react";
 import Amount from "./Amount";
 import { Separator } from "./ui/separator";
-export default function LogCard({ log }: { log: Logs[number] }) {
+export default function LogCard({
+  log,
+}: {
+  log: Database["public"]["Tables"]["log"]["Row"] & {
+    money: Database["public"]["Tables"]["money"]["Row"];
+  };
+}) {
   const isReceiver =
     log.transferDetails?.receivers.some((r) => log.moneyId === r.id) ?? false;
   const getDiff = (key: "amount" | "totalMoney") => {
@@ -58,11 +63,11 @@ export default function LogCard({ log }: { log: Logs[number] }) {
         <div className="text-muted-foreground mt-1 flex items-center gap-1 text-sm">
           <Link to="/list/$id" params={{ id: log.moneyId as string }}>
             <Banknote className="inline size-4" />
-            <span className="ml-1 inline text-sm">{log.moneyData?.name}</span>
+            <span className="ml-1 inline text-sm">{log.money?.name}</span>
           </Link>
           |
           <Clock className="size-4" />
-          <p className="text-sm">{log.createdAt?.toLocaleDateString()}</p>
+          <p className="text-sm">{new Date(log.created_at).toLocaleDateString()}</p>
         </div>
         {!isReceiver && log.transferDetails ? (
           <div className="bg-muted/50 mt-4 rounded-3xl p-4">
@@ -155,7 +160,7 @@ function Data({
   totalMoneyDiffComponent,
   title,
 }: {
-  data: (typeof log.$inferSelect)["changes"]["prev"];
+  data: Changes["prev"];
   moneyDiffComponent?: React.ReactNode;
   totalMoneyDiffComponent?: React.ReactNode;
   title: string;

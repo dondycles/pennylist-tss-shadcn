@@ -53,7 +53,7 @@ function Moneys() {
           totalMoney={total}
         />
       ))}
-      <TotalMoneySetter money={moneys.data} />
+      <TotalMoneySetter moneys={moneys.data} />
     </div>
   );
 }

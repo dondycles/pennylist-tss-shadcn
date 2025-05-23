@@ -2,7 +2,7 @@ import LogCard from "@/components/LogCard";
 import MoneyCard from "@/components/MoneyCard";
 import MoneySkeleton from "@/components/MoneySkeleton";
 import { moneyQueryOptions } from "@/lib/queries/money";
-import { type Logs } from "@/lib/server/fn/logs";
+import { Database } from "@/lib/server/supabase/types";
 import { useMoneyState } from "@/lib/stores/money-state";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
@@ -36,12 +36,20 @@ function Money() {
         m={m.data}
         totalMoney={total}
       />
-      <Logs logs={m.data.logsData.map((log) => ({ ...log, moneyData: m.data }))} />
+      <Logs logs={m.data.log.map((log) => ({ ...log, money: m.data }))} />
     </>
   );
 }
 
-function Logs({ logs }: { logs: Logs }) {
+function Logs({
+  logs,
+}: {
+  logs: Array<
+    Database["public"]["Tables"]["log"]["Row"] & {
+      money: Database["public"]["Tables"]["money"]["Row"];
+    }
+  >;
+}) {
   return (
     <div className="pb-32">
       <p className="text-muted-foreground px-4 pt-4 text-center">Logs</p>

@@ -1,4 +1,4 @@
-import { addMoney, editMoney, Money, moneySchema } from "@/lib/server/fn/money";
+import { addMoney, editMoney, moneySchema } from "@/lib/server/fn/money";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
@@ -13,6 +13,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Database } from "@/lib/server/supabase/types";
 import { useMoneyState } from "@/lib/stores/money-state";
 import { useRouteContext } from "@tanstack/react-router";
 import { Loader2, RotateCw } from "lucide-react";
@@ -28,7 +29,7 @@ export default function MoneyForm({
   deepView,
 }: {
   close: () => void;
-  initialData?: Money;
+  initialData?: Database["public"]["Tables"]["money"]["Row"];
   deepView: boolean;
 }) {
   const { queryClient, user } = useRouteContext({ from: "__root__" });

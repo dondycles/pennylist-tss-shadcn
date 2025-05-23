@@ -1,12 +1,9 @@
 import { authMiddleware } from "@/lib/middleware/auth-guard";
 import { createServerFn } from "@tanstack/react-start";
-import { and, eq } from "drizzle-orm";
 import _ from "lodash";
 import z from "zod";
-import { db } from "../db";
-import { money } from "../schema/money.schema";
+import { getSupabaseServerClient } from "../supabase";
 import { addLog } from "./logs";
-import { getUserSettings } from "./user";
 
 export const moneySchema = z.object({
   name: z.string().min(1),
@@ -37,16 +34,14 @@ export const getMoneys = createServerFn({ method: "GET" })
         user: { id: userId },
       },
     }) => {
-      const settings = await getUserSettings();
-      const flow = settings?.settings?.flow ?? "desc";
-      const sortBy = settings?.settings?.sortBy ?? "date";
-      return await db.query.money.findMany({
-        where: (money, { eq }) => eq(money.userId, userId),
-        orderBy: (money, { asc, desc }) =>
-          flow === "asc"
-            ? asc(sortBy === "amount" ? money.amount : money.createdAt)
-            : desc(sortBy === "amount" ? money.amount : money.createdAt),
-      });
+      const supabase = getSupabaseServerClient();
+      const { data, error } = await supabase
+        .from("money")
+        .select()
+        .eq("userId", userId)
+        .order("created_at", { ascending: false });
+      if (error) throw new Error(error.message);
+      return data;
     },
   );
 
@@ -60,75 +55,64 @@ export const getMoney = createServerFn({ method: "GET" })
       },
       data: id,
     }) => {
-      return (
-        (await db.query.money.findFirst({
-          where: (money, { eq, and }) => and(eq(money.userId, userId), eq(money.id, id)),
-          with: {
-            logsData: true,
-          },
-        })) ?? null
-      );
+      const supabase = getSupabaseServerClient();
+      const { data, error } = await supabase
+        .from("money")
+        .select("*, log(*)")
+        .eq("userId", userId)
+        .eq("id", id)
+        .single();
+      if (error) throw new Error(error.message);
+      return data;
     },
   );
-
-export const getTotalMoney = createServerFn({ method: "GET" })
-  .middleware([authMiddleware])
-  .handler(
-    async ({
-      context: {
-        user: { id: userId },
-      },
-    }) => {
-      const result = await db.query.money.findMany({
-        where: (money, { eq }) => eq(money.userId, userId),
-        columns: {
-          amount: true,
-        },
-      });
-      return result.reduce((sum, item) => sum + item.amount, 0);
-    },
-  );
-
-export type Money = Awaited<ReturnType<typeof getMoneys>>[0];
 
 export const addMoney = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .validator(moneySchema.extend({ totalMoney: z.coerce.number().nonnegative() }))
-  .handler(async ({ data: moneyData, context: { user } }) => {
-    const insteredMoneyData = await db
-      .insert(money)
-      .values({
-        ...moneyData,
-        userId: user.id,
+  .handler(async ({ data: moneyData }) => {
+    const supabase = getSupabaseServerClient();
+    const { data: insteredMoneyData, error } = await supabase
+      .from("money")
+      .insert({
+        name: moneyData.name,
+        amount: moneyData.amount,
+        color: moneyData.color,
       })
-      .returning();
-    await addLog({
-      data: {
-        changes: {
-          current: {
-            ...insteredMoneyData[0],
-            totalMoney: moneyData.totalMoney + moneyData.amount,
+      .select()
+      .single();
+    if (error) throw new Error(error.message);
+    if (insteredMoneyData)
+      await addLog({
+        data: {
+          changes: {
+            current: {
+              ...insteredMoneyData,
+              totalMoney: moneyData.totalMoney + moneyData.amount,
+            },
+            prev: { ...insteredMoneyData, totalMoney: moneyData.totalMoney },
           },
-          prev: { ...insteredMoneyData[0], totalMoney: moneyData.totalMoney },
+          moneyId: insteredMoneyData.id,
+          type: "add",
+          reason: "Add",
         },
-        moneyId: insteredMoneyData[0].id,
-        type: "add",
-        reason: "Add",
-      },
-    });
+      });
   });
 
 export const editMoney = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .validator(editMoneySchema.extend({ totalMoney: z.coerce.number().nonnegative() }))
   .handler(async ({ data: { current, prev, totalMoney, reason }, context: { user } }) => {
-    await db
-      .update(money)
-      .set({
+    const supabase = getSupabaseServerClient();
+    const { error } = await supabase
+      .from("money")
+      .update({
         ...current,
-        updatedAt: new Date(),
+        updated_at: new Date().toISOString(),
       })
-      .where(and(eq(money.id, current.id), eq(money.userId, user.id)));
+      .eq("id", current.id)
+      .eq("userId", user.id);
+    if (error) throw new Error(error.message);
     await addLog({
       data: {
         changes: {
@@ -149,9 +133,13 @@ export const deleteMoney = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
   .validator(moneyWithIdSchema.extend({ totalMoney: z.coerce.number().nonnegative() }))
   .handler(async ({ data: moneyData, context: { user } }) => {
-    await db
-      .delete(money)
-      .where(and(eq(money.id, moneyData.id), eq(money.userId, user.id)));
+    const supabase = getSupabaseServerClient();
+    const { error } = await supabase
+      .from("money")
+      .delete()
+      .eq("id", moneyData.id)
+      .eq("userId", user.id);
+    if (error) throw new Error(error.message);
     await addLog({
       data: {
         changes: {
@@ -176,10 +164,17 @@ export const transferMoneys = createServerFn({ method: "POST" })
   .handler(async ({ data: { receivers, sender, totalMoney }, context: { user } }) => {
     const fees = _.sum(receivers.map((r) => r.fee ?? 0));
     const cashIns = _.sum(receivers.map((r) => r.cashIn ?? 0));
-    await db
-      .update(money)
-      .set({ ...sender, amount: sender.amount - fees - cashIns })
-      .where(and(eq(money.id, sender.id), eq(money.userId, user.id)));
+    const supabase = getSupabaseServerClient();
+    const { error } = await supabase
+      .from("money")
+      .update({
+        ...sender,
+        amount: sender.amount - fees - cashIns,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", sender.id)
+      .eq("userId", user.id);
+    if (error) throw new Error(error.message);
     await addLog({
       data: {
         changes: {
@@ -200,31 +195,35 @@ export const transferMoneys = createServerFn({ method: "POST" })
       },
     });
 
-    await db.transaction(async (tx) => {
-      for (const receiver of receivers) {
-        await tx
-          .update(money)
-          .set({ ...receiver, amount: receiver.amount + (receiver.cashIn ?? 0) })
-          .where(and(eq(money.id, receiver.id), eq(money.userId, user.id)));
-        await addLog({
-          data: {
-            changes: {
-              current: {
-                ...receiver,
-                amount: receiver.amount + (receiver.cashIn ?? 0),
-                totalMoney: totalMoney - fees,
-              },
-              prev: { ...receiver, totalMoney: totalMoney },
+    for (const receiver of receivers) {
+      const { error } = await supabase
+        .from("money")
+        .update({
+          ...receiver,
+          amount: receiver.amount + (receiver.cashIn ?? 0),
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", receiver.id)
+        .eq("userId", user.id);
+      if (error) throw new Error(error.message);
+      await addLog({
+        data: {
+          changes: {
+            current: {
+              ...receiver,
+              amount: receiver.amount + (receiver.cashIn ?? 0),
+              totalMoney: totalMoney - fees,
             },
-            moneyId: receiver.id,
-            type: "transfer",
-            reason: receiver.reason ?? undefined,
-            transferDetails: {
-              receivers,
-              sender,
-            },
+            prev: { ...receiver, totalMoney: totalMoney },
           },
-        });
-      }
-    });
+          moneyId: receiver.id,
+          type: "transfer",
+          reason: receiver.reason ?? undefined,
+          transferDetails: {
+            receivers,
+            sender,
+          },
+        },
+      });
+    }
   });

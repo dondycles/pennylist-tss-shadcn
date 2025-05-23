@@ -1,8 +1,9 @@
 import { z } from "zod";
 import { create } from "zustand";
-import { Money, moneyWithTransferDetailsSchema } from "../server/fn/money";
+import { moneyWithTransferDetailsSchema } from "../server/fn/money";
+import { Database } from "../server/supabase/types";
 
-export type MoneyWithTransferDetails = Money & {
+export type MoneyWithTransferDetails = Database["public"]["Tables"]["money"]["Row"] & {
   fee?: number;
   reason?: string;
   cashIn?: number;

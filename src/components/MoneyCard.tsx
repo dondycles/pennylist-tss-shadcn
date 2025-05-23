@@ -1,5 +1,6 @@
-import { deleteMoney, Money } from "@/lib/server/fn/money";
+import { deleteMoney } from "@/lib/server/fn/money";
 import { GetUser } from "@/lib/server/fn/user";
+import { Database } from "@/lib/server/supabase/types";
 import { useTransferState } from "@/lib/stores/transfer-state";
 import { QueryClient, useMutation } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
@@ -18,7 +19,7 @@ export default function MoneyCard({
   queryClient,
   totalMoney,
 }: {
-  m: Money;
+  m: Database["public"]["Tables"]["money"]["Row"];
   deepView: boolean;
   moneysQty: number;
   user: GetUser;

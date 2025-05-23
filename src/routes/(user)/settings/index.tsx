@@ -1,4 +1,3 @@
-import ActionConfirmDialog from "@/components/ActionConfirmDialog";
 import { useEffect, useId } from "react";
 
 import { Label } from "@/components/ui/label";
@@ -10,8 +9,11 @@ import {
   DollarSign,
   Eye,
   EyeClosed,
+  MoonIcon,
+  SunIcon,
 } from "lucide-react";
 
+import ActionConfirmDialog from "@/components/ActionConfirmDialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,7 +33,7 @@ import { ListState, useListState } from "@/lib/stores/list-state";
 import { useMoneyState } from "@/lib/stores/money-state";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate, useRouteContext } from "@tanstack/react-router";
-import { MoonIcon, Settings, SunIcon } from "lucide-react";
+import { Settings } from "lucide-react";
 import { useState } from "react";
 export const Route = createFileRoute("/(user)/settings/")({
   component: RouteComponent,
@@ -71,7 +73,7 @@ function RouteComponent() {
     mutationFn: () => {
       return updateUserSettings({
         data: {
-          asteriskMoney: asterisk,
+          asterisk,
           flow,
           sortBy,
           theme,
@@ -96,10 +98,10 @@ function RouteComponent() {
       </div>
       <div className="flex items-center gap-4 px-4">
         <Avatar className="size-16">
-          <AvatarImage className="" src={user?.image ?? "favicon.ico"} />
+          <AvatarImage className="" src={user?.email ?? "favicon.ico"} />
           <AvatarFallback>Pfp</AvatarFallback>
         </Avatar>
-        <p className="truncate text-2xl font-bold sm:text-4xl">{user?.name}</p>
+        <p className="truncate text-2xl font-bold sm:text-4xl">{user?.email}</p>
       </div>
       <p className="text-muted-foreground px-4">
         Joined at {user?.createdAt.toLocaleString()}
@@ -112,8 +114,8 @@ function RouteComponent() {
             <ListSorterDropdown
               pending={handleUpdateUserSettings.isPending}
               listState={{
-                flow: settings.data?.settings?.flow ?? flow,
-                sortBy: settings.data?.settings?.sortBy ?? sortBy,
+                flow: settings.data.flow ?? flow,
+                sortBy: settings.data.sortBy ?? sortBy,
                 setState: (state) => {
                   setState(state);
                 },
@@ -128,7 +130,7 @@ function RouteComponent() {
             <SwitcherComponent
               pending={handleUpdateUserSettings.isPending}
               id={id}
-              checked={settings.data?.settings?.asteriskMoney ?? asterisk}
+              checked={settings.data.asterisk ?? asterisk}
               onCheckedChange={setAsterisk}
               checkedIcon={<Eye size={16} aria-hidden="true" />}
               uncheckedIcon={<EyeClosed size={16} aria-hidden="true" />}
@@ -141,7 +143,7 @@ function RouteComponent() {
             <SwitcherComponent
               pending={handleUpdateUserSettings.isPending}
               id={id}
-              checked={settings.data?.settings?.theme === "dark" || theme === "dark"}
+              checked={settings.data.theme === "dark" || theme === "dark"}
               onCheckedChange={toggleTheme}
               checkedIcon={<MoonIcon size={16} aria-hidden="true" />}
               uncheckedIcon={<SunIcon size={16} aria-hidden="true" />}

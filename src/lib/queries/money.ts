@@ -11,11 +11,5 @@ export const moneysQueryOptions = (userId: string | undefined) =>
 export const moneyQueryOptions = (id: string) =>
   queryOptions({
     queryKey: ["money", id],
-    queryFn: async ({ signal }) => {
-      const money = await getMoney({ data: id, signal });
-      if (!money) {
-        throw new Error("Money not found");
-      }
-      return money;
-    },
+    queryFn: async ({ signal }) => await getMoney({ data: id, signal }),
   });
