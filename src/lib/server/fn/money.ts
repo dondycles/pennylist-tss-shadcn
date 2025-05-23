@@ -186,7 +186,6 @@ export const transferMoneys = createServerFn({ method: "POST" })
     const { error } = await supabase
       .from("money")
       .update({
-        ...sender,
         amount: sender.amount - fees - cashIns,
         updated_at: new Date().toISOString(),
       })
@@ -218,7 +217,6 @@ export const transferMoneys = createServerFn({ method: "POST" })
       const { error } = await supabase
         .from("money")
         .update({
-          ...receiver,
           amount: receiver.amount + (receiver.cashIn ?? 0),
           updated_at: new Date().toISOString(),
         })

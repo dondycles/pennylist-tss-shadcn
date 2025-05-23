@@ -57,17 +57,20 @@ export const getLogs = createServerFn({ method: "GET" })
       type?: "add" | "edit" | "delete" | "transfer";
       money?: string;
       q?: string;
+      pageParam?: number;
     }) => data,
   )
-  .handler(async ({ context: { user }, data: { flow, type, money, q } }) => {
+  .handler(async ({ context: { user }, data: { flow, type, money, q, pageParam } }) => {
     const supabase = getSupabaseServerClient();
+    const page = typeof pageParam === "number" ? pageParam : 0;
     let query = supabase
       .from("log")
       .select("*, money!inner(*)")
       .eq("userId", user.id)
       .order("created_at", {
         ascending: flow === "asc" ? true : false,
-      });
+      })
+      .range(page * 4, page * 4 + 3);
 
     if (q) {
       query = query.ilike("type", `%${q}%`);

@@ -12,6 +12,7 @@ import { Link } from "@tanstack/react-router";
 import _ from "lodash";
 import { ArrowDownIcon, ArrowUpIcon, Banknote, Clock } from "lucide-react";
 import Amount from "./Amount";
+import TimeInfo from "./TimeInfo";
 import { Separator } from "./ui/separator";
 export default function LogCard({
   log,
@@ -67,7 +68,7 @@ export default function LogCard({
           </Link>
           |
           <Clock className="size-4" />
-          <p className="text-sm">{new Date(log.created_at).toLocaleDateString()}</p>
+          <TimeInfo createdAt={log.created_at} />
         </div>
         {!isReceiver && log.transferDetails ? (
           <div className="bg-muted/50 mt-4 rounded-3xl p-4">

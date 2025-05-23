@@ -1,12 +1,14 @@
 import LogCard from "@/components/LogCard";
 import PageStatusSetter from "@/components/PageStatusSetter";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import useAutoLoadNextPage from "@/lib/hooks/use-auto-reload-infinite-q";
 import { logsQueryOptions } from "@/lib/queries/logs";
 import { debounce } from "@tanstack/pacer";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { FileClock, RefreshCw } from "lucide-react";
-import { Suspense } from "react";
+import React, { Suspense } from "react";
 export const Route = createFileRoute("/(user)/logs/")({
   component: RouteComponent,
   validateSearch: (search: {
@@ -19,7 +21,7 @@ export const Route = createFileRoute("/(user)/logs/")({
     return { search };
   },
   loader: async ({ context }) => {
-    await context.queryClient.prefetchQuery(
+    await context.queryClient.prefetchInfiniteQuery(
       logsQueryOptions({
         userId: context.user?.id,
         flow: context.search.flow,
@@ -85,7 +87,7 @@ function RouteComponent() {
 
 function Logs() {
   const { search, user } = Route.useRouteContext();
-  const logs = useSuspenseQuery(
+  const logs = useSuspenseInfiniteQuery(
     logsQueryOptions({
       userId: user?.id,
       flow: search.flow,
@@ -94,18 +96,67 @@ function Logs() {
       q: search.q,
     }),
   );
+  const _logs = logs.data.pages.flatMap((page) => page);
+
+  const { ref, loaderRef } = useAutoLoadNextPage({
+    fetchNextPage: () => logs.fetchNextPage(),
+  });
   return (
     <div className="pb-32">
       {search.q ? (
-        !logs.data.length ? (
+        !_logs.length ? (
           <p className="text-muted-foreground text-center">No results for '{search.q}'</p>
         ) : (
-          <p className="text-muted-foreground text-center">Results for '{search.q}'</p>
+          <>
+            <p className="text-muted-foreground text-center">Results for '{search.q}'</p>
+            {_logs.map((log, i) => {
+              if (i === _logs.length - 1)
+                return (
+                  <React.Fragment key={log.id}>
+                    <div ref={ref} key={log.id} className="flex-1" />
+                    <LogCard log={log} key={log.id} />
+                  </React.Fragment>
+                );
+              return <LogCard log={log} key={log.id} />;
+            })}
+            <Button
+              className="text-muted-foreground text-xs font-light"
+              hidden={!logs.hasNextPage}
+              ref={loaderRef}
+              variant={"ghost"}
+              onClick={() => {
+                logs.fetchNextPage();
+              }}
+            >
+              {logs.isFetchingNextPage ? "Loading..." : "Fetch more posts"}
+            </Button>
+          </>
         )
-      ) : null}
-      {logs.data.map((log) => (
-        <LogCard log={log} key={log.id} />
-      ))}
+      ) : (
+        <>
+          {_logs.map((log, i) => {
+            if (i === _logs.length - 1)
+              return (
+                <React.Fragment key={log.id}>
+                  <div ref={ref} key={log.id} className="flex-1" />
+                  <LogCard log={log} key={log.id} />
+                </React.Fragment>
+              );
+            return <LogCard log={log} key={log.id} />;
+          })}
+          <Button
+            className="text-muted-foreground text-xs font-light"
+            hidden={!logs.hasNextPage}
+            ref={loaderRef}
+            variant={"ghost"}
+            onClick={() => {
+              logs.fetchNextPage();
+            }}
+          >
+            {logs.isFetchingNextPage ? "Loading..." : "Fetch more posts"}
+          </Button>
+        </>
+      )}
     </div>
   );
 }
