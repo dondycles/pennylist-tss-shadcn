@@ -10,7 +10,7 @@ import {
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
-import { userQueryOptions, userSettingsQueryOptions } from "@/lib/queries/user";
+import { userQueryOptions } from "@/lib/queries/user";
 import { getUser } from "@/lib/server/fn/user";
 import appCss from "@/lib/styles/app.css?url";
 
@@ -20,8 +20,7 @@ export const Route = createRootRouteWithContext<{
 }>()({
   beforeLoad: async ({ context }) => {
     const user = await context.queryClient.fetchQuery(userQueryOptions()); // we're using react-query for caching, see router.tsx
-    const setting = await context.queryClient.fetchQuery(userSettingsQueryOptions());
-    return { user, setting };
+    return { user };
   },
   head: () => ({
     meta: [
