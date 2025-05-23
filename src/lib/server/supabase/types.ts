@@ -1,10 +1,19 @@
-import { ListState } from "@/lib/stores/list-state";
 import { z } from "zod";
 import { moneySchema } from "../fn/money";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Json = Record<string, any>;
-
+export type ListState = {
+  sortBy: "date" | "amount";
+  flow: "asc" | "desc";
+  setState: ({
+    sortBy,
+    flow,
+  }: {
+    sortBy: "date" | "amount";
+    flow: "asc" | "desc";
+  }) => void;
+};
 export type MoneyPrimaryDataOnly = Omit<z.infer<typeof moneySchema>, "reason">;
 export type Changes = {
   prev: MoneyPrimaryDataOnly & { totalMoney: number };

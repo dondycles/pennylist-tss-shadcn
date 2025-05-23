@@ -11,6 +11,7 @@ import {
   EyeClosed,
   MoonIcon,
   SunIcon,
+  User2,
 } from "lucide-react";
 
 import ActionConfirmDialog from "@/components/ActionConfirmDialog";
@@ -23,13 +24,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/animate-ui/radix/dropdown-menu";
 import PageStatusSetter from "@/components/PageStatusSetter";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { userSettingsQueryOptions } from "@/lib/queries/user";
 import { updateUserSettings } from "@/lib/server/fn/user";
-import { ListState, useListState } from "@/lib/stores/list-state";
+import { ListState } from "@/lib/server/supabase/types";
 import { useMoneyState } from "@/lib/stores/money-state";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate, useRouteContext } from "@tanstack/react-router";
@@ -51,7 +51,6 @@ function RouteComponent() {
     localStorage.theme as "dark" | "light",
   );
   const { asterisk, setAsterisk } = useMoneyState();
-  const { flow, sortBy, setState } = useListState();
 
   const handleUpdateUserSettings = useMutation({
     mutationFn: (
@@ -79,12 +78,12 @@ function RouteComponent() {
       document.documentElement.classList.remove("dark");
       localStorage.theme = "light";
       setTheme("light");
-      handleUpdateUserSettings.mutate({ asterisk, flow, sortBy, theme: "light" });
+      handleUpdateUserSettings.mutate({ ...settings.data, asterisk, theme: "light" });
     } else {
       document.documentElement.classList.add("dark");
       localStorage.theme = "dark";
       setTheme("dark");
-      handleUpdateUserSettings.mutate({ asterisk, flow, sortBy, theme: "dark" });
+      handleUpdateUserSettings.mutate({ ...settings.data, asterisk, theme: "dark" });
     }
   }
 
@@ -95,18 +94,17 @@ function RouteComponent() {
         <p>Settings</p>
       </div>
       <div className="flex items-center gap-4 px-4">
-        <Avatar className="size-16">
-          <AvatarImage className="" src={user?.email ?? "favicon.ico"} />
-          <AvatarFallback>Pfp</AvatarFallback>
-        </Avatar>
+        <User2 className="size-10" />
         <p className="truncate text-2xl font-bold sm:text-4xl">{user?.email}</p>
       </div>
-      <p className="text-muted-foreground px-4">
-        Joined at {new Date(user?.createdAt ?? new Date()).toLocaleString()}
-      </p>
-      <p className="text-muted-foreground px-4">
-        Last update at {new Date(settings.data.updated_at ?? new Date()).toLocaleString()}
-      </p>
+      <div className="text-muted-foreground space-y-1 px-4 text-sm">
+        <p>Joined at {new Date(user?.createdAt ?? new Date()).toLocaleString()}</p>
+        <p>
+          Last update at{" "}
+          {new Date(settings.data.updated_at ?? new Date()).toLocaleString()}
+        </p>
+      </div>
+
       <Separator />
       <div className="space-y-4 px-4">
         <SettingBar
@@ -115,10 +113,9 @@ function RouteComponent() {
             <ListSorterDropdown
               pending={handleUpdateUserSettings.isPending}
               listState={{
-                flow: settings.data.flow ?? flow,
-                sortBy: settings.data.sortBy ?? sortBy,
+                flow: settings.data.flow,
+                sortBy: settings.data.sortBy,
                 setState: (state) => {
-                  setState(state);
                   handleUpdateUserSettings.mutate({ ...state, asterisk, theme });
                 },
               }}
@@ -132,10 +129,10 @@ function RouteComponent() {
             <SwitcherComponent
               pending={handleUpdateUserSettings.isPending}
               id={id}
-              checked={settings.data.asterisk ?? asterisk}
+              checked={settings.data.asterisk}
               onCheckedChange={(asterisk) => {
                 setAsterisk(asterisk);
-                handleUpdateUserSettings.mutate({ asterisk, theme, flow, sortBy });
+                handleUpdateUserSettings.mutate({ ...settings.data, asterisk, theme });
               }}
               checkedIcon={<Eye size={16} aria-hidden="true" />}
               uncheckedIcon={<EyeClosed size={16} aria-hidden="true" />}
