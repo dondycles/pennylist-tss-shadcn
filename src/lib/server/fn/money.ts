@@ -89,7 +89,6 @@ export const getMoneyIds = createServerFn({ method: "GET" })
       context: {
         user: { id: userId },
       },
-      data: id,
     }) => {
       const supabase = getSupabaseServerClient();
       const { data, error } = await supabase.from("money").select().eq("userId", userId);
