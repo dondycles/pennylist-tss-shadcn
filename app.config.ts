@@ -2,6 +2,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "@tanstack/react-start/config";
 import { VitePWA } from "vite-plugin-pwa";
 import tsConfigPaths from "vite-tsconfig-paths";
+
 export default defineConfig({
   vite: {
     plugins: [
@@ -46,9 +47,9 @@ export default defineConfig({
           runtimeCaching: [
             {
               urlPattern: ({ url }) => {
-                return url.pathname.startsWith("/api");
+                return url.pathname.startsWith("/");
               },
-              handler: "CacheFirst",
+              handler: "NetworkOnly",
               options: {
                 cacheName: "api-cache",
                 cacheableResponse: {
@@ -57,6 +58,9 @@ export default defineConfig({
               },
             },
           ],
+          skipWaiting: true,
+          clientsClaim: true,
+          navigationPreload: true,
         },
       }),
     ],
