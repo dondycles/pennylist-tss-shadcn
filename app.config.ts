@@ -46,12 +46,11 @@ export default defineConfig({
         workbox: {
           runtimeCaching: [
             {
-              urlPattern: ({ url }) => {
-                return url.pathname.startsWith("/");
-              },
+              urlPattern: /.*/i,
               handler: "NetworkOnly",
             },
           ],
+
           skipWaiting: true,
           clientsClaim: true,
           navigationPreload: true,
