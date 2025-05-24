@@ -18,6 +18,7 @@ export default defineConfig({
           start_url: "/",
           scope: "/",
           display: "fullscreen",
+          display_override: ["fullscreen"],
           background_color: "#000000",
           theme_color: "#000000",
           icons: [
