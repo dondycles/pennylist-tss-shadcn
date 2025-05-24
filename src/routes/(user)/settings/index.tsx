@@ -34,7 +34,7 @@ import { userSettingsQueryOptions } from "@/lib/queries/user";
 import { updateUserSettings } from "@/lib/server/fn/user";
 import { ListState } from "@/lib/server/supabase/types";
 import { useMoneyState } from "@/lib/stores/money-state";
-import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate, useRouteContext } from "@tanstack/react-router";
 import { Settings } from "lucide-react";
 import { useState } from "react";
@@ -48,7 +48,7 @@ export const Route = createFileRoute("/(user)/settings/")({
 function RouteComponent() {
   const { user, queryClient } = useRouteContext({ from: "__root__" });
   const navigate = useNavigate();
-  const settings = useSuspenseQuery(userSettingsQueryOptions());
+  const settings = useQuery(userSettingsQueryOptions());
 
   const [theme, setTheme] = useState<"dark" | "light">(
     localStorage.theme as "dark" | "light",
@@ -81,12 +81,20 @@ function RouteComponent() {
       document.documentElement.classList.remove("dark");
       localStorage.theme = "light";
       setTheme("light");
-      handleUpdateUserSettings.mutate({ ...settings.data, asterisk, theme: "light" });
+      handleUpdateUserSettings.mutate(
+        settings.data
+          ? { ...settings.data, theme: "light" }
+          : { flow: "desc", sortBy: "date", asterisk, theme: "light" },
+      );
     } else {
       document.documentElement.classList.add("dark");
       localStorage.theme = "dark";
       setTheme("dark");
-      handleUpdateUserSettings.mutate({ ...settings.data, asterisk, theme: "dark" });
+      handleUpdateUserSettings.mutate(
+        settings.data
+          ? { ...settings.data, theme: "dark" }
+          : { flow: "desc", sortBy: "date", asterisk, theme: "dark" },
+      );
     }
   }
 
@@ -109,7 +117,7 @@ function RouteComponent() {
         <div>
           <span>Last update </span>
           <TimeInfo
-            createdAt={settings.data.updated_at ?? new Date().toLocaleString()}
+            createdAt={settings.data?.updated_at ?? new Date().toLocaleString()}
           />{" "}
           <History className="inline size-4" />
         </div>
@@ -123,8 +131,8 @@ function RouteComponent() {
             <ListSorterDropdown
               pending={handleUpdateUserSettings.isPending}
               listState={{
-                flow: settings.data.flow,
-                sortBy: settings.data.sortBy,
+                flow: settings.data ? settings.data.flow : "desc",
+                sortBy: settings.data ? settings.data.sortBy : "date",
                 setState: (state) => {
                   handleUpdateUserSettings.mutate({ ...state, asterisk, theme });
                 },
@@ -139,10 +147,14 @@ function RouteComponent() {
             <SwitcherComponent
               pending={handleUpdateUserSettings.isPending}
               id={id}
-              checked={settings.data.asterisk}
+              checked={settings.data?.asterisk}
               onCheckedChange={(asterisk) => {
                 setAsterisk(asterisk);
-                handleUpdateUserSettings.mutate({ ...settings.data, asterisk, theme });
+                handleUpdateUserSettings.mutate(
+                  settings.data
+                    ? { ...settings.data, asterisk }
+                    : { asterisk, theme, flow: "desc", sortBy: "date" },
+                );
               }}
               checkedIcon={<Eye size={16} aria-hidden="true" />}
               uncheckedIcon={<EyeClosed size={16} aria-hidden="true" />}
@@ -155,7 +167,11 @@ function RouteComponent() {
             <SwitcherComponent
               pending={handleUpdateUserSettings.isPending}
               id={id}
-              checked={settings.data.theme === "light" || theme === "light"}
+              checked={
+                settings.data
+                  ? settings.data.theme === "light" || theme === "light"
+                  : theme === "light"
+              }
               onCheckedChange={toggleTheme}
               checkedIcon={<MoonIcon size={16} aria-hidden="true" />}
               uncheckedIcon={<SunIcon size={16} aria-hidden="true" />}
