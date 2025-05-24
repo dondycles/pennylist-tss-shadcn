@@ -10,10 +10,7 @@ export default defineConfig({
       }),
       tailwindcss(),
       VitePWA({
-        registerType: "autoUpdate",
         injectRegister: "script",
-        devOptions: { enabled: true },
-        includeAssets: ["favicon.ico", "icon-256.png", "icon-512.png", "summary.png"],
         manifest: {
           name: "pennylist.",
           short_name: "pennylist.",
@@ -43,31 +40,16 @@ export default defineConfig({
             },
           ],
         },
+        devOptions: { enabled: true },
         workbox: {
           runtimeCaching: [
             {
-              urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
-              handler: "CacheFirst",
-              options: {
-                cacheName: "google-fonts-cache",
-                expiration: {
-                  maxEntries: 10,
-                  maxAgeSeconds: 60 * 60 * 24 * 365, // <== 365 days
-                },
-                cacheableResponse: {
-                  statuses: [0, 200],
-                },
+              urlPattern: ({ url }) => {
+                return url.pathname.startsWith("/api");
               },
-            },
-            {
-              urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
               handler: "CacheFirst",
               options: {
-                cacheName: "gstatic-fonts-cache",
-                expiration: {
-                  maxEntries: 10,
-                  maxAgeSeconds: 60 * 60 * 24 * 365, // <== 365 days
-                },
+                cacheName: "api-cache",
                 cacheableResponse: {
                   statuses: [0, 200],
                 },
@@ -78,7 +60,6 @@ export default defineConfig({
       }),
     ],
   },
-
   // https://react.dev/learn/react-compiler
   react: {
     babel: {
