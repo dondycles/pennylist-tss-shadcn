@@ -50,12 +50,6 @@ export default defineConfig({
                 return url.pathname.startsWith("/");
               },
               handler: "NetworkOnly",
-              options: {
-                cacheName: "api-cache",
-                cacheableResponse: {
-                  statuses: [0, 200],
-                },
-              },
             },
           ],
           skipWaiting: true,
