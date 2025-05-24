@@ -13,6 +13,8 @@ import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { userQueryOptions } from "@/lib/queries/user";
 import { getUser } from "@/lib/server/fn/user";
 import appCss from "@/lib/styles/app.css?url";
+import { useEffect } from "react";
+import { getSerwist } from "virtual:serwist";
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -52,6 +54,21 @@ export const Route = createRootRouteWithContext<{
 });
 
 function RootComponent() {
+  useEffect(() => {
+    const loadSerwist = async () => {
+      if ("serviceWorker" in navigator) {
+        const serwist = await getSerwist();
+
+        serwist?.addEventListener("installed", () => {
+          console.log("Serwist installed!");
+        });
+
+        void serwist?.register();
+      }
+    };
+
+    loadSerwist();
+  }, []);
   return (
     <RootDocument>
       <Outlet />
