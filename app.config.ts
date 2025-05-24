@@ -17,7 +17,7 @@ export default defineConfig({
           description: "Avoid becoming penniless, start using pennylist.",
           start_url: "/",
           scope: "/",
-          display: "standalone",
+          display: "fullscreen",
           background_color: "#000000",
           theme_color: "#000000",
           icons: [
