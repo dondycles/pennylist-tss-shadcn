@@ -38,8 +38,14 @@ export const Route = createRootRouteWithContext<{
         name: "description",
         content: "Avoid becoming penniless, start using pennylist.",
       },
+      { name: "theme-color", content: "#000000" },
     ],
-    links: [{ rel: "stylesheet", href: appCss }],
+    links: [
+      { rel: "stylesheet", href: appCss },
+      { rel: "icon", href: "/favicon.ico" },
+      { rel: "apple-touch-icon", href: "/icon-256.png", sizes: "256x256" },
+      { rel: "mask-icon", href: "/icon-512.png" },
+    ],
   }),
   component: RootComponent,
 });
