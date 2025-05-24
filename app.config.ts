@@ -47,7 +47,12 @@ export default defineConfig({
           runtimeCaching: [
             {
               urlPattern: /.*/i,
-              handler: "NetworkOnly",
+              handler: "CacheFirst",
+              options: {
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
+              },
             },
           ],
 
