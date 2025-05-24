@@ -11,6 +11,7 @@ export default defineConfig({
       tailwindcss(),
       VitePWA({
         injectRegister: "script",
+        includeAssets: ["favicon.ico", "icon-512.png", "icon-256.png"],
         manifest: {
           name: "pennylist.",
           short_name: "pennylist.",
