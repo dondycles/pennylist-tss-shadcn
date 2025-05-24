@@ -17,8 +17,8 @@ export default defineConfig({
           description: "Avoid becoming penniless, start using pennylist.",
           start_url: "/",
           scope: "/",
-          display: "fullscreen",
-          display_override: ["fullscreen"],
+          display: "standalone",
+          display_override: ["standalone"],
           background_color: "#000000",
           theme_color: "#000000",
           icons: [
@@ -41,7 +41,6 @@ export default defineConfig({
             },
           ],
         },
-        devOptions: { enabled: true },
         workbox: {
           runtimeCaching: [
             {

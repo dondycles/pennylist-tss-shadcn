@@ -39,6 +39,7 @@ export const Route = createRootRouteWithContext<{
         content: "Avoid becoming penniless, start using pennylist.",
       },
       { name: "theme-color", content: "#000000" },
+      { name: "background-color", content: "#000000" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
