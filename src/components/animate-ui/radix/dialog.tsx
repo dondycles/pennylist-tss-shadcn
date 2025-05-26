@@ -94,12 +94,14 @@ type DialogContentProps = React.ComponentProps<typeof DialogPrimitive.Content> &
   };
 
 function DialogContent({
+  showX = true,
   className,
   children,
   from = "top",
   transition = { type: "spring", stiffness: 150, damping: 25 },
+  overlayClassName,
   ...props
-}: DialogContentProps) {
+}: DialogContentProps & { showX?: boolean; overlayClassName?: string }) {
   const { isOpen } = useDialog();
 
   const initialRotation = from === "top" || from === "left" ? "20deg" : "-20deg";
@@ -110,7 +112,7 @@ function DialogContent({
     <AnimatePresence>
       {isOpen && (
         <DialogPortal forceMount data-slot="dialog-portal">
-          <DialogOverlay asChild forceMount>
+          <DialogOverlay className={overlayClassName} asChild forceMount>
             <motion.div
               key="dialog-overlay"
               initial={{ opacity: 0, filter: "blur(4px)" }}
@@ -151,10 +153,12 @@ function DialogContent({
               {...props}
             >
               {children}
-              <DialogPrimitive.Close className="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-4 right-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none">
-                <X className="h-4 w-4" />
-                <span className="sr-only">Close</span>
-              </DialogPrimitive.Close>
+              {showX ? (
+                <DialogPrimitive.Close className="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-4 right-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none">
+                  <X className="h-4 w-4" />
+                  <span className="sr-only">Close</span>
+                </DialogPrimitive.Close>
+              ) : null}
             </motion.div>
           </DialogPrimitive.Content>
         </DialogPortal>

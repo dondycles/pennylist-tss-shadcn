@@ -1,5 +1,5 @@
 import { queryOptions } from "@tanstack/react-query";
-import { getUser, getUserSettings } from "../server/fn/user";
+import { getUser, getUserPIN, getUserSettings } from "../server/fn/user";
 
 export const userQueryOptions = () =>
   queryOptions({
@@ -11,4 +11,13 @@ export const userSettingsQueryOptions = () =>
   queryOptions({
     queryKey: ["user-settings"],
     queryFn: async ({ signal }) => await getUserSettings({ signal }),
+  });
+
+export const userPINQueryOptions = () =>
+  queryOptions({
+    queryKey: ["user-pin"],
+    queryFn: async ({ signal }) => {
+      const { PIN } = await getUserPIN({ signal });
+      return PIN;
+    },
   });

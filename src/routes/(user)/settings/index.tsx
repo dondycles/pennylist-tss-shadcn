@@ -36,6 +36,7 @@ import {
 } from "@/components/animate-ui/radix/dropdown-menu";
 import PageStatusSetter from "@/components/PageStatusSetter";
 import Scrollable from "@/components/Scrollable";
+import Slot from "@/components/Slot";
 import TimeInfo from "@/components/TimeInfo";
 import { Button } from "@/components/ui/button";
 import {
@@ -52,11 +53,10 @@ import { userSettingsQueryOptions } from "@/lib/queries/user";
 import { updateUserSettings } from "@/lib/server/fn/user";
 import { ListState } from "@/lib/server/supabase/types";
 import { useMoneyState } from "@/lib/stores/money-state";
-import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate, useRouteContext } from "@tanstack/react-router";
-import { OTPInput, SlotProps } from "input-otp";
+import { OTPInput } from "input-otp";
 import { Settings } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -364,18 +364,6 @@ function ListSorterDropdown({
     </DropdownMenu>
   );
 }
-function Slot(props: SlotProps) {
-  return (
-    <div
-      className={cn(
-        "border-input bg-background text-foreground relative -ms-px flex size-9 items-center justify-center border font-medium shadow-xs transition-[color,box-shadow] first:ms-0 first:rounded-s-3xl last:rounded-e-3xl",
-        { "border-ring ring-ring/50 z-10 ring-[3px]": props.isActive },
-      )}
-    >
-      {props.char !== null && <div>{props.char}</div>}
-    </div>
-  );
-}
 
 function PinCard({
   PIN,
@@ -426,7 +414,8 @@ function ChangePinForm({
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={(e) => e.preventDefault()}
+        // onSubmit={form.handleSubmit(onSubmit)}
         className="flex flex-col items-center justify-center gap-4"
       >
         <FormField
@@ -480,9 +469,9 @@ function ChangePinForm({
         <ActionConfirmDialog
           title="Change PIN"
           desc="Are you sure to change PIN?"
-          confirm={() => setPin(form.getValues("newPIN"))}
+          confirm={form.handleSubmit(onSubmit)}
         >
-          <Button disabled={pending} type="button" className="w-full">
+          <Button disabled={pending} type="submit" className="w-full">
             {pending ? <Loader2 className="animate-spin" /> : "Change PIN"}
           </Button>
         </ActionConfirmDialog>
@@ -531,7 +520,8 @@ function NewPinForm({
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={(e) => e.preventDefault()}
+        // onSubmit={form.handleSubmit(onSubmit)}
         className="flex flex-col items-center justify-center gap-4"
       >
         <FormField
@@ -563,9 +553,9 @@ function NewPinForm({
         <ActionConfirmDialog
           title="Set PIN"
           desc="Are you sure to set PIN?"
-          confirm={() => setPin(form.getValues("PIN"))}
+          confirm={form.handleSubmit(onSubmit)}
         >
-          <Button disabled={pending} type="button" className="w-full">
+          <Button disabled={pending} type="submit" className="w-full">
             {pending ? <Loader2 className="animate-spin" /> : "Set PIN"}
           </Button>
         </ActionConfirmDialog>

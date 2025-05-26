@@ -56,7 +56,6 @@ export const updateUserSettings = createServerFn({ method: "POST" })
           id: id,
           updated_at: new Date().toISOString(),
           PIN: data.PIN,
-          withPIN: data.withPIN,
         })
         .eq("userId", id);
       if (error) throw new Error(JSON.stringify(error, null, 2));
@@ -81,5 +80,24 @@ export const initiateUserSettings = createServerFn({ method: "POST" })
         userId: id,
       });
       if (error) throw new Error(JSON.stringify(error, null, 2));
+    },
+  );
+
+export const getUserPIN = createServerFn({ method: "GET" })
+  .middleware([authMiddleware])
+  .handler(
+    async ({
+      context: {
+        user: { id },
+      },
+    }) => {
+      const supabase = getSupabaseServerClient();
+      const { error, data } = await supabase
+        .from("setting")
+        .select("PIN")
+        .eq("userId", id)
+        .single();
+      if (error) throw new Error(JSON.stringify(error, null, 2));
+      return data;
     },
   );
