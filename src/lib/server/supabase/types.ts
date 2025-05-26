@@ -137,6 +137,7 @@ export type Database = {
           theme: "dark" | "light";
           userId: string;
           updated_at: string | null;
+          PIN: string | null;
         };
         Insert: {
           asterisk?: boolean;
@@ -147,6 +148,7 @@ export type Database = {
           theme?: "dark" | "light";
           userId?: string;
           updated_at?: string | null;
+          PIN?: string | null;
         };
         Update: {
           asterisk?: boolean;
@@ -157,6 +159,7 @@ export type Database = {
           theme?: "dark" | "light";
           userId?: string;
           updated_at?: string | null;
+          PIN?: string | null;
         };
         Relationships: [];
       };

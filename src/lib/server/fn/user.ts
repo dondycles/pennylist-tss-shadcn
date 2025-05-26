@@ -55,8 +55,31 @@ export const updateUserSettings = createServerFn({ method: "POST" })
           theme: data.theme,
           id: id,
           updated_at: new Date().toISOString(),
+          PIN: data.PIN,
+          withPIN: data.withPIN,
         })
         .eq("userId", id);
+      if (error) throw new Error(JSON.stringify(error, null, 2));
+    },
+  );
+
+export const initiateUserSettings = createServerFn({ method: "POST" })
+  .middleware([authMiddleware])
+  .handler(
+    async ({
+      context: {
+        user: { id },
+      },
+    }) => {
+      const supabase = getSupabaseServerClient();
+      const { error } = await supabase.from("setting").insert({
+        asterisk: false,
+        flow: "desc",
+        sortBy: "date",
+        theme: "dark",
+        updated_at: new Date().toISOString(),
+        userId: id,
+      });
       if (error) throw new Error(JSON.stringify(error, null, 2));
     },
   );

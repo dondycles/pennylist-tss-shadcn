@@ -1,4 +1,4 @@
-import { useId } from "react";
+import { Suspense, useId } from "react";
 
 import { Label } from "@/components/ui/label";
 import {
@@ -11,6 +11,7 @@ import {
   Eye,
   EyeClosed,
   History,
+  Loader2,
   MoonIcon,
   SunIcon,
   User2,
@@ -28,16 +29,29 @@ import {
 import PageStatusSetter from "@/components/PageStatusSetter";
 import TimeInfo from "@/components/TimeInfo";
 import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { userSettingsQueryOptions } from "@/lib/queries/user";
 import { updateUserSettings } from "@/lib/server/fn/user";
 import { ListState } from "@/lib/server/supabase/types";
 import { useMoneyState } from "@/lib/stores/money-state";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { cn } from "@/lib/utils";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate, useRouteContext } from "@tanstack/react-router";
+import { OTPInput, SlotProps } from "input-otp";
 import { Settings } from "lucide-react";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 export const Route = createFileRoute("/(user)/settings/")({
   component: RouteComponent,
   loader: ({ context }) => {
@@ -46,22 +60,41 @@ export const Route = createFileRoute("/(user)/settings/")({
 });
 
 function RouteComponent() {
+  return (
+    <div className="flex h-full flex-col gap-4 pt-4 pb-32">
+      <div className="text-muted-foreground flex items-center gap-2 border-b px-4 pb-4">
+        <Settings />
+        <p>Settings</p>
+      </div>
+      <Suspense
+        fallback={
+          <p className="text-muted-foreground text-center">Getting settings...</p>
+        }
+      >
+        <SettingsComponent />
+      </Suspense>
+    </div>
+  );
+}
+
+function SettingsComponent() {
   const { user, queryClient } = useRouteContext({ from: "__root__" });
   const navigate = useNavigate();
-  const settings = useQuery(userSettingsQueryOptions());
-
+  const settings = useSuspenseQuery(userSettingsQueryOptions());
   const [theme, setTheme] = useState<"dark" | "light">(
     localStorage.theme as "dark" | "light",
   );
   const { asterisk, setAsterisk } = useMoneyState();
 
   const handleUpdateUserSettings = useMutation({
-    mutationFn: (
-      data: Pick<ListState, "flow" | "sortBy"> & {
-        theme: "dark" | "light";
-        asterisk: boolean;
-      },
-    ) => {
+    mutationFn: (data: {
+      theme?: "dark" | "light";
+      asterisk?: boolean;
+      withPIN?: boolean | null;
+      PIN?: string | null;
+      sortBy?: "date" | "amount";
+      flow?: "asc" | "desc";
+    }) => {
       return updateUserSettings({
         data,
       });
@@ -81,29 +114,16 @@ function RouteComponent() {
       document.documentElement.classList.remove("dark");
       localStorage.theme = "light";
       setTheme("light");
-      handleUpdateUserSettings.mutate(
-        settings.data
-          ? { ...settings.data, theme: "light" }
-          : { flow: "desc", sortBy: "date", asterisk, theme: "light" },
-      );
+      handleUpdateUserSettings.mutate({ ...settings.data, theme: "light" });
     } else {
       document.documentElement.classList.add("dark");
       localStorage.theme = "dark";
       setTheme("dark");
-      handleUpdateUserSettings.mutate(
-        settings.data
-          ? { ...settings.data, theme: "dark" }
-          : { flow: "desc", sortBy: "date", asterisk, theme: "dark" },
-      );
+      handleUpdateUserSettings.mutate({ ...settings.data, theme: "dark" });
     }
   }
-
   return (
-    <div className="flex h-full flex-col gap-4 pt-4 pb-32">
-      <div className="text-muted-foreground flex items-center gap-2 border-b px-4 pb-4">
-        <Settings />
-        <p>Settings</p>
-      </div>
+    <>
       <div className="flex items-center gap-4 px-4">
         <User2 className="size-10" />
         <p className="truncate text-2xl font-bold sm:text-4xl">{user?.email}</p>
@@ -122,7 +142,6 @@ function RouteComponent() {
           <History className="inline size-4" />
         </div>
       </div>
-
       <Separator />
       <div className="space-y-4 px-4">
         <SettingBar
@@ -134,27 +153,24 @@ function RouteComponent() {
                 flow: settings.data ? settings.data.flow : "desc",
                 sortBy: settings.data ? settings.data.sortBy : "date",
                 setState: (state) => {
-                  handleUpdateUserSettings.mutate({ ...state, asterisk, theme });
+                  handleUpdateUserSettings.mutate({ ...settings.data, ...state });
                 },
               }}
               id={id}
             />
           )}
         />
+        <SettingBar label="Unlock On Open" card={<PinCard PIN={settings.data?.PIN} />} />
         <SettingBar
           label="Money Visibility"
           component={(id) => (
             <SwitcherComponent
               pending={handleUpdateUserSettings.isPending}
               id={id}
-              checked={settings.data?.asterisk}
+              checked={settings.data?.asterisk ?? asterisk}
               onCheckedChange={(asterisk) => {
                 setAsterisk(asterisk);
-                handleUpdateUserSettings.mutate(
-                  settings.data
-                    ? { ...settings.data, asterisk }
-                    : { asterisk, theme, flow: "desc", sortBy: "date" },
-                );
+                handleUpdateUserSettings.mutate({ ...settings.data, asterisk });
               }}
               checkedIcon={<Eye size={16} aria-hidden="true" />}
               uncheckedIcon={<EyeClosed size={16} aria-hidden="true" />}
@@ -209,22 +225,34 @@ function RouteComponent() {
           showAnalyticsPageBtn: true,
         }}
       />
-    </div>
+    </>
   );
 }
 
 function SettingBar({
   label,
   component,
+  card,
 }: {
   label: string;
-  component: (id: string) => React.ReactNode;
+  component?: (id: string) => React.ReactNode;
+  card?: React.ReactNode;
 }) {
   const id = useId();
+  if (card)
+    return (
+      <div className="bg-muted/50 flex flex-col items-center justify-between gap-4 rounded-3xl p-4">
+        <div className="flex w-full items-center justify-between">
+          <Label htmlFor={id}>{label}</Label>
+          {component ? component(id) : null}
+        </div>
+        {card}
+      </div>
+    );
   return (
     <div className="bg-muted/50 flex items-center justify-between gap-4 rounded-3xl p-4">
       <Label htmlFor={id}>{label}</Label>
-      {component(id)}
+      {component ? component(id) : null}
     </div>
   );
 }
@@ -298,5 +326,218 @@ function ListSorterDropdown({
         </DropdownMenuRadioGroup>
       </DropdownMenuContent>
     </DropdownMenu>
+  );
+}
+function Slot(props: SlotProps) {
+  return (
+    <div
+      className={cn(
+        "border-input bg-background text-foreground relative -ms-px flex size-9 items-center justify-center border font-medium shadow-xs transition-[color,box-shadow] first:ms-0 first:rounded-s-3xl last:rounded-e-3xl",
+        { "border-ring ring-ring/50 z-10 ring-[3px]": props.isActive },
+      )}
+    >
+      {props.char !== null && <div>{props.char}</div>}
+    </div>
+  );
+}
+
+function PinCard({ PIN }: { PIN?: string | null }) {
+  return PIN ? <ChangePinForm PIN={PIN} /> : <NewPinForm PIN={PIN} />;
+}
+
+function ChangePinForm({ PIN }: { PIN: string }) {
+  const { queryClient } = Route.useRouteContext();
+  const handleUpdateUserSettings = useMutation({
+    mutationFn: (data: { PIN?: string | null }) => {
+      return updateUserSettings({
+        data,
+      });
+    },
+    onSuccess: () => {
+      form.reset();
+      queryClient.invalidateQueries({ queryKey: ["user-settings"] });
+    },
+  });
+
+  const formSchema = z
+    .object({
+      currentPIN: z.string().min(4).max(4),
+      newPIN: z.string().min(4).max(4),
+    })
+    .refine((data) => data.currentPIN === PIN, {
+      message: "Did no match with current PIN",
+      path: ["currentPIN"],
+    });
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      currentPIN: "",
+      newPIN: "",
+    },
+  });
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    handleUpdateUserSettings.mutate({ PIN: values.newPIN });
+  }
+  return (
+    <div className="w-full">
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="flex flex-col items-center justify-center gap-4"
+        >
+          <FormField
+            control={form.control}
+            name="currentPIN"
+            render={({ field }) => (
+              <FormItem className="">
+                <FormLabel>Current PIN</FormLabel>
+                <FormControl>
+                  <OTPInput
+                    {...field}
+                    containerClassName="flex items-center gap-3 has-disabled:opacity-50"
+                    maxLength={4}
+                    render={({ slots }) => (
+                      <div className="flex">
+                        {slots.map((slot, idx) => (
+                          <Slot key={idx} {...slot} />
+                        ))}
+                      </div>
+                    )}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="newPIN"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>New PIN</FormLabel>
+                <FormControl>
+                  <OTPInput
+                    {...field}
+                    containerClassName="flex items-center gap-3 has-disabled:opacity-50"
+                    maxLength={4}
+                    render={({ slots }) => (
+                      <div className="flex">
+                        {slots.map((slot, idx) => (
+                          <Slot key={idx} {...slot} />
+                        ))}
+                      </div>
+                    )}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button
+            disabled={handleUpdateUserSettings.isPending}
+            type="submit"
+            className="w-full"
+          >
+            {handleUpdateUserSettings.isPending ? (
+              <Loader2 className="animate-spin" />
+            ) : (
+              "Change PIN"
+            )}
+          </Button>
+          <Button
+            disabled={handleUpdateUserSettings.isPending}
+            type="button"
+            className="w-full"
+            variant={"destructive"}
+            onClick={() => handleUpdateUserSettings.mutate({ PIN: null })}
+          >
+            {handleUpdateUserSettings.isPending ? (
+              <Loader2 className="animate-spin" />
+            ) : (
+              "Remove PIN"
+            )}
+          </Button>
+        </form>
+      </Form>
+    </div>
+  );
+}
+
+function NewPinForm({ PIN }: { PIN?: string | null }) {
+  const { queryClient } = Route.useRouteContext();
+  const handleUpdateUserSettings = useMutation({
+    mutationFn: (data: { PIN?: string | null }) => {
+      return updateUserSettings({
+        data,
+      });
+    },
+    onSuccess: () => {
+      form.reset();
+      queryClient.invalidateQueries({ queryKey: ["user-settings"] });
+    },
+  });
+  const formSchema = z.object({
+    PIN: z.string().min(4).max(4),
+  });
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      PIN: PIN ?? undefined,
+    },
+  });
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    handleUpdateUserSettings.mutate({ PIN: values.PIN });
+  }
+  return (
+    <div className="w-full">
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="flex flex-col items-center justify-center gap-4"
+        >
+          <FormField
+            control={form.control}
+            name="PIN"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>PIN</FormLabel>
+                <FormControl>
+                  <OTPInput
+                    {...field}
+                    id="PIN"
+                    name="pin"
+                    containerClassName="flex items-center gap-3 has-disabled:opacity-50"
+                    maxLength={4}
+                    render={({ slots }) => (
+                      <div className="flex">
+                        {slots.map((slot, idx) => (
+                          <Slot key={idx} {...slot} />
+                        ))}
+                      </div>
+                    )}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button
+            disabled={handleUpdateUserSettings.isPending}
+            type="submit"
+            className="w-full"
+          >
+            {handleUpdateUserSettings.isPending ? (
+              <Loader2 className="animate-spin" />
+            ) : (
+              "Set PIN"
+            )}
+          </Button>
+        </form>
+      </Form>
+    </div>
   );
 }
