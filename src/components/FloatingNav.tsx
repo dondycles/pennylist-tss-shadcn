@@ -21,7 +21,12 @@ export default function FloatingNav() {
           <Plus className="size-5" />
         </Button>
       </MoneyFormDialog>
-      <Button type="button" size={"icon"} variant={"ghost"}>
+      <Button
+        hidden={floatingNavState.showAddMoneyBtn}
+        type="button"
+        size={"icon"}
+        variant={"ghost"}
+      >
         <Link to="/list">
           <List
             className={`${floatingNavState.showAddMoneyBtn ? "text-foreground" : "text-muted-foreground"} size-5`}
