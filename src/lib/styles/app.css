@@ -48,6 +48,7 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
   --breakpoint-xs: 30rem;
+  --breakpoint-fs: 56rem;
 }
 
 :root {

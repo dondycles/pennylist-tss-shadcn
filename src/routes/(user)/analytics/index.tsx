@@ -7,6 +7,8 @@ export const Route = createFileRoute("/(user)/analytics/")({
   component: RouteComponent,
 });
 
+import { TotalMoneyChart } from "@/components/TotalMoneyChart";
+
 function RouteComponent() {
   // const { logs, search } = Route.useRouteContext();
 
@@ -21,6 +23,7 @@ function RouteComponent() {
           <RefreshCw className="size-4" />
         </button>
       </div>
+      <TotalMoneyChart />
       <PageStatusSetter
         state={{
           showAddMoneyBtn: false,
