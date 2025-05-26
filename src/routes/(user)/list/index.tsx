@@ -41,7 +41,7 @@ function Moneys() {
   const { total } = useMoneyState();
   const moneys = useSuspenseQuery(moneysQueryOptions(user?.id));
   return (
-    <div className="pb-32">
+    <div>
       {moneys.data?.map((m) => (
         <MoneyCard
           queryClient={queryClient}

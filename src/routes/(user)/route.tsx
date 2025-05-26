@@ -21,11 +21,9 @@ function RouteComponent() {
 
   if (user)
     return (
-      <div className="h-dvh w-full">
-        <div className="mx-auto h-full w-full max-w-4xl">
-          <Outlet />
-          <FloatingNav />
-        </div>
+      <div className="flex h-full w-full justify-center overflow-hidden">
+        <Outlet />
+        <FloatingNav />
       </div>
     );
 }

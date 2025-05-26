@@ -1,5 +1,6 @@
 import LogCard from "@/components/LogCard";
 import PageStatusSetter from "@/components/PageStatusSetter";
+import Scrollable from "@/components/Scrollable";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -55,8 +56,8 @@ function RouteComponent() {
     },
   );
   return (
-    <div className="flex h-full flex-col gap-4 pt-4 pb-32">
-      <div className="text-muted-foreground flex items-center justify-between gap-4 border-b px-4 pb-4">
+    <Scrollable hideTotalMoney={true}>
+      <div className="text-muted-foreground flex items-center justify-between gap-4 border-b p-4">
         <div className="flex items-center gap-2">
           <FileClock />
           <p>Logs </p>
@@ -89,7 +90,7 @@ function RouteComponent() {
           showAnalyticsPageBtn: true,
         }}
       />
-    </div>
+    </Scrollable>
   );
 }
 

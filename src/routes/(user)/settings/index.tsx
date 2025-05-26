@@ -19,6 +19,14 @@ import {
 
 import ActionConfirmDialog from "@/components/ActionConfirmDialog";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/animate-ui/radix/dialog";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuRadioGroup,
@@ -27,6 +35,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/animate-ui/radix/dropdown-menu";
 import PageStatusSetter from "@/components/PageStatusSetter";
+import Scrollable from "@/components/Scrollable";
 import TimeInfo from "@/components/TimeInfo";
 import { Button } from "@/components/ui/button";
 import {
@@ -61,8 +70,8 @@ export const Route = createFileRoute("/(user)/settings/")({
 
 function RouteComponent() {
   return (
-    <div className="flex h-full flex-col gap-4 pt-4 pb-32">
-      <div className="text-muted-foreground flex items-center gap-2 border-b px-4 pb-4">
+    <Scrollable hideTotalMoney={true}>
+      <div className="text-muted-foreground flex items-center gap-2 border-b p-4">
         <Settings />
         <p>Settings</p>
       </div>
@@ -73,7 +82,7 @@ function RouteComponent() {
       >
         <SettingsComponent />
       </Suspense>
-    </div>
+    </Scrollable>
   );
 }
 
@@ -84,8 +93,8 @@ function SettingsComponent() {
   const [theme, setTheme] = useState<"dark" | "light">(
     localStorage.theme as "dark" | "light",
   );
+  const [openPINDialog, setOpenPINDialog] = useState(false);
   const { asterisk, setAsterisk } = useMoneyState();
-
   const handleUpdateUserSettings = useMutation({
     mutationFn: (data: {
       theme?: "dark" | "light";
@@ -100,6 +109,7 @@ function SettingsComponent() {
       });
     },
     onSuccess: () => {
+      setOpenPINDialog(false);
       settings.refetch();
       queryClient.invalidateQueries({ queryKey: ["moneys", user?.id] });
     },
@@ -160,7 +170,34 @@ function SettingsComponent() {
             />
           )}
         />
-        <SettingBar label="Unlock On Open" card={<PinCard PIN={settings.data?.PIN} />} />
+        <Dialog onOpenChange={setOpenPINDialog} open={openPINDialog}>
+          <SettingBar
+            label="Ask PIN On Open"
+            component={() => (
+              <DialogTrigger asChild>
+                <Button variant={"secondary"}>
+                  {settings.data.PIN === null ? "Set PIN" : "Change/Remove PIN"}
+                </Button>
+              </DialogTrigger>
+            )}
+          />
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>
+                {settings.data.PIN !== null ? "Change/Remove PIN" : "Set PIN"}
+              </DialogTitle>
+              <DialogDescription>
+                Current PIN: {settings.data.PIN ?? "Not set"}
+              </DialogDescription>
+            </DialogHeader>
+            <PinCard
+              setPin={(PIN) => handleUpdateUserSettings.mutate({ PIN })}
+              pending={handleUpdateUserSettings.isPending}
+              PIN={settings.data?.PIN}
+            />
+          </DialogContent>
+        </Dialog>
+
         <SettingBar
           label="Money Visibility"
           component={(id) => (
@@ -216,7 +253,6 @@ function SettingsComponent() {
           </Button>
         </ActionConfirmDialog>
       </div>
-
       <PageStatusSetter
         state={{
           showAddMoneyBtn: false,
@@ -241,12 +277,12 @@ function SettingBar({
   const id = useId();
   if (card)
     return (
-      <div className="bg-muted/50 flex flex-col items-center justify-between gap-4 rounded-3xl p-4">
+      <div className="bg-muted/50 flex w-full flex-col items-center justify-between gap-4 rounded-3xl p-4">
         <div className="flex w-full items-center justify-between">
           <Label htmlFor={id}>{label}</Label>
           {component ? component(id) : null}
         </div>
-        {card}
+        <div className="w-full">{card}</div>
       </div>
     );
   return (
@@ -341,24 +377,31 @@ function Slot(props: SlotProps) {
   );
 }
 
-function PinCard({ PIN }: { PIN?: string | null }) {
-  return PIN ? <ChangePinForm PIN={PIN} /> : <NewPinForm PIN={PIN} />;
+function PinCard({
+  PIN,
+  pending,
+  setPin,
+}: {
+  PIN?: string | null;
+  pending: boolean;
+  setPin: (PIN: string | null) => void;
+}) {
+  return PIN ? (
+    <ChangePinForm PIN={PIN} pending={pending} setPin={setPin} />
+  ) : (
+    <NewPinForm PIN={PIN} pending={pending} setPin={setPin} />
+  );
 }
 
-function ChangePinForm({ PIN }: { PIN: string }) {
-  const { queryClient } = Route.useRouteContext();
-  const handleUpdateUserSettings = useMutation({
-    mutationFn: (data: { PIN?: string | null }) => {
-      return updateUserSettings({
-        data,
-      });
-    },
-    onSuccess: () => {
-      form.reset();
-      queryClient.invalidateQueries({ queryKey: ["user-settings"] });
-    },
-  });
-
+function ChangePinForm({
+  PIN,
+  pending,
+  setPin,
+}: {
+  PIN: string;
+  pending: boolean;
+  setPin: (PIN: string | null) => void;
+}) {
   const formSchema = z
     .object({
       currentPIN: z.string().min(4).max(4),
@@ -378,106 +421,99 @@ function ChangePinForm({ PIN }: { PIN: string }) {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    handleUpdateUserSettings.mutate({ PIN: values.newPIN });
+    setPin(values.newPIN);
   }
   return (
-    <div className="w-full">
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="flex flex-col items-center justify-center gap-4"
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex flex-col items-center justify-center gap-4"
+      >
+        <FormField
+          control={form.control}
+          name="currentPIN"
+          render={({ field }) => (
+            <FormItem className="">
+              <FormLabel>Current PIN</FormLabel>
+              <FormControl>
+                <OTPInput
+                  {...field}
+                  containerClassName="flex items-center gap-3 has-disabled:opacity-50"
+                  maxLength={4}
+                  render={({ slots }) => (
+                    <div className="flex">
+                      {slots.map((slot, idx) => (
+                        <Slot key={idx} {...slot} />
+                      ))}
+                    </div>
+                  )}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="newPIN"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>New PIN</FormLabel>
+              <FormControl>
+                <OTPInput
+                  {...field}
+                  containerClassName="flex items-center gap-3 has-disabled:opacity-50"
+                  maxLength={4}
+                  render={({ slots }) => (
+                    <div className="flex">
+                      {slots.map((slot, idx) => (
+                        <Slot key={idx} {...slot} />
+                      ))}
+                    </div>
+                  )}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <ActionConfirmDialog
+          title="Change PIN"
+          desc="Are you sure to change PIN?"
+          confirm={() => setPin(form.getValues("newPIN"))}
         >
-          <FormField
-            control={form.control}
-            name="currentPIN"
-            render={({ field }) => (
-              <FormItem className="">
-                <FormLabel>Current PIN</FormLabel>
-                <FormControl>
-                  <OTPInput
-                    {...field}
-                    containerClassName="flex items-center gap-3 has-disabled:opacity-50"
-                    maxLength={4}
-                    render={({ slots }) => (
-                      <div className="flex">
-                        {slots.map((slot, idx) => (
-                          <Slot key={idx} {...slot} />
-                        ))}
-                      </div>
-                    )}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="newPIN"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>New PIN</FormLabel>
-                <FormControl>
-                  <OTPInput
-                    {...field}
-                    containerClassName="flex items-center gap-3 has-disabled:opacity-50"
-                    maxLength={4}
-                    render={({ slots }) => (
-                      <div className="flex">
-                        {slots.map((slot, idx) => (
-                          <Slot key={idx} {...slot} />
-                        ))}
-                      </div>
-                    )}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button
-            disabled={handleUpdateUserSettings.isPending}
-            type="submit"
-            className="w-full"
-          >
-            {handleUpdateUserSettings.isPending ? (
-              <Loader2 className="animate-spin" />
-            ) : (
-              "Change PIN"
-            )}
+          <Button disabled={pending} type="button" className="w-full">
+            {pending ? <Loader2 className="animate-spin" /> : "Change PIN"}
           </Button>
+        </ActionConfirmDialog>
+        <ActionConfirmDialog
+          title="Remove PIN"
+          desc="Are you sure to remove PIN?"
+          confirm={() => setPin(null)}
+        >
           <Button
-            disabled={handleUpdateUserSettings.isPending}
+            disabled={pending}
             type="button"
             className="w-full"
             variant={"destructive"}
-            onClick={() => handleUpdateUserSettings.mutate({ PIN: null })}
           >
-            {handleUpdateUserSettings.isPending ? (
-              <Loader2 className="animate-spin" />
-            ) : (
-              "Remove PIN"
-            )}
+            {pending ? <Loader2 className="animate-spin" /> : "Remove PIN"}
           </Button>
-        </form>
-      </Form>
-    </div>
+        </ActionConfirmDialog>
+      </form>
+    </Form>
   );
 }
 
-function NewPinForm({ PIN }: { PIN?: string | null }) {
-  const { queryClient } = Route.useRouteContext();
-  const handleUpdateUserSettings = useMutation({
-    mutationFn: (data: { PIN?: string | null }) => {
-      return updateUserSettings({
-        data,
-      });
-    },
-    onSuccess: () => {
-      form.reset();
-      queryClient.invalidateQueries({ queryKey: ["user-settings"] });
-    },
-  });
+function NewPinForm({
+  PIN,
+  pending,
+  setPin,
+}: {
+  PIN?: string | null;
+  pending: boolean;
+  setPin: (PIN: string | null) => void;
+}) {
   const formSchema = z.object({
     PIN: z.string().min(4).max(4),
   });
@@ -490,54 +526,50 @@ function NewPinForm({ PIN }: { PIN?: string | null }) {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    handleUpdateUserSettings.mutate({ PIN: values.PIN });
+    setPin(values.PIN);
   }
   return (
-    <div className="w-full">
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="flex flex-col items-center justify-center gap-4"
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex flex-col items-center justify-center gap-4"
+      >
+        <FormField
+          control={form.control}
+          name="PIN"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>PIN</FormLabel>
+              <FormControl>
+                <OTPInput
+                  {...field}
+                  id="PIN"
+                  name="pin"
+                  containerClassName="flex items-center gap-3 has-disabled:opacity-50"
+                  maxLength={4}
+                  render={({ slots }) => (
+                    <div className="flex">
+                      {slots.map((slot, idx) => (
+                        <Slot key={idx} {...slot} />
+                      ))}
+                    </div>
+                  )}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <ActionConfirmDialog
+          title="Set PIN"
+          desc="Are you sure to set PIN?"
+          confirm={() => setPin(form.getValues("PIN"))}
         >
-          <FormField
-            control={form.control}
-            name="PIN"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>PIN</FormLabel>
-                <FormControl>
-                  <OTPInput
-                    {...field}
-                    id="PIN"
-                    name="pin"
-                    containerClassName="flex items-center gap-3 has-disabled:opacity-50"
-                    maxLength={4}
-                    render={({ slots }) => (
-                      <div className="flex">
-                        {slots.map((slot, idx) => (
-                          <Slot key={idx} {...slot} />
-                        ))}
-                      </div>
-                    )}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button
-            disabled={handleUpdateUserSettings.isPending}
-            type="submit"
-            className="w-full"
-          >
-            {handleUpdateUserSettings.isPending ? (
-              <Loader2 className="animate-spin" />
-            ) : (
-              "Set PIN"
-            )}
+          <Button disabled={pending} type="button" className="w-full">
+            {pending ? <Loader2 className="animate-spin" /> : "Set PIN"}
           </Button>
-        </form>
-      </Form>
-    </div>
+        </ActionConfirmDialog>
+      </form>
+    </Form>
   );
 }

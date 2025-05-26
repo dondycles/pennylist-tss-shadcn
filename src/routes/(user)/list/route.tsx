@@ -1,4 +1,4 @@
-import TotalMoneyBar from "@/components/TotalMoneyBar";
+import Scrollable from "@/components/Scrollable";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/(user)/list")({
@@ -7,9 +7,8 @@ export const Route = createFileRoute("/(user)/list")({
 
 function RouteComponent() {
   return (
-    <>
-      <TotalMoneyBar />
+    <Scrollable>
       <Outlet />
-    </>
+    </Scrollable>
   );
 }

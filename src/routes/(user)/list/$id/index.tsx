@@ -51,11 +51,11 @@ function Logs({
   >;
 }) {
   return (
-    <div className="pb-32">
+    <>
       <p className="text-muted-foreground px-4 pt-4 text-center">Logs</p>
       {logs.map((log) => (
         <LogCard log={log} key={log.id} />
       ))}
-    </div>
+    </>
   );
 }
