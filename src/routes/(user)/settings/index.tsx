@@ -88,6 +88,7 @@ function RouteComponent() {
 
 function SettingsComponent() {
   const { user, queryClient } = useRouteContext({ from: "__root__" });
+
   const navigate = useNavigate();
   const settings = useSuspenseQuery(userSettingsQueryOptions());
   const [theme, setTheme] = useState<"dark" | "light">(
@@ -149,7 +150,7 @@ function SettingsComponent() {
           <TimeInfo
             createdAt={settings.data?.updated_at ?? new Date().toLocaleString()}
           />{" "}
-          <History className="inline size-4" />
+          <History className="text-gree inline size-4" />
         </div>
       </div>
       <Separator />

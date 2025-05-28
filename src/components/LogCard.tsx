@@ -69,6 +69,7 @@ export default function LogCard({
           |
           <Clock className="size-4" />
           <TimeInfo createdAt={log.created_at} />
+          {new Date(log.created_at).toLocaleDateString()}
         </div>
         {!isReceiver && log.transferDetails ? (
           <div className="bg-muted/50 mt-4 rounded-3xl p-4">

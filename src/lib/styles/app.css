@@ -76,6 +76,9 @@
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
+  --chart-totalMoney: oklch(0.6394 0.217588 142.4953);
+  --chart-totalAdditions: oklch(0.7072 0.1679 242.04);
+  --chart-totalDeductions: oklch(0.8016 0.1705 73.27);
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.141 0.005 285.823);
   --sidebar-primary: oklch(0.21 0.006 285.885);
