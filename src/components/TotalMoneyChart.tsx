@@ -25,6 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Analytics } from "@/lib/server/fn/analytics";
 import { differenceInDays } from "date-fns";
 
 const chartConfig = {
@@ -43,49 +44,44 @@ export function TotalMoneyChart({
   data,
   dateJoined,
 }: {
-  data: {
-    date: string;
-    totalMoney: number;
-    totalAdditions: number;
-    totalDeductions: number;
-  }[];
+  data: Analytics;
   dateJoined: Date;
 }) {
-  const [timeRange, setTimeRange] = React.useState("90d");
+  const [timeRange, setTimeRange] = React.useState("sincejoined");
 
-  const filteredData = data.filter((item) => {
-    const date = new Date(item.date);
-    const referenceDate = new Date();
-    let daysToSubtract = differenceInDays(new Date(), dateJoined);
-    if (timeRange === "30d") {
-      daysToSubtract = 30;
-    } else if (timeRange === "7d") {
-      daysToSubtract = 7;
-    }
-    const startDate = new Date(referenceDate);
-    startDate.setDate(startDate.getDate() - daysToSubtract);
-    return date >= startDate;
-  });
+  const filteredData =
+    timeRange === "monthssincejoined"
+      ? data.groupLogsByMonth
+      : data.groupLogsByDate.filter((item) => {
+          const date = new Date(item.date);
+          const referenceDate = new Date();
+          let daysToSubtract = differenceInDays(new Date(), dateJoined) + 1;
+          if (timeRange === "30d") {
+            daysToSubtract = 30 < daysToSubtract ? 30 : daysToSubtract;
+          } else if (timeRange === "7d") {
+            daysToSubtract = 7 < daysToSubtract ? 7 : daysToSubtract;
+          }
+          const startDate = new Date(referenceDate);
+          startDate.setDate(startDate.getDate() - daysToSubtract);
+          return date >= startDate;
+        });
   return (
-    <Card className="border-b py-4 shadow-none">
+    <Card className="bg-transparent p-0 pb-4">
       <CardHeader className="flex items-center gap-2 space-y-0 p-0 px-4 sm:flex-row">
         <div className="grid flex-1 gap-1">
           <CardTitle>Total Money</CardTitle>
-          <CardDescription>
-            Showing total money each day since joined{" "}
-            {differenceInDays(new Date(), dateJoined)}
-          </CardDescription>
+          <CardDescription>Showing total money each day since joined</CardDescription>
         </div>
         <Select value={timeRange} onValueChange={setTimeRange}>
-          <SelectTrigger
-            className="w-[160px] rounded-lg sm:ml-auto"
-            aria-label="Select a value"
-          >
-            <SelectValue placeholder="Last 3 months" />
+          <SelectTrigger className="rounded-lg sm:ml-auto" aria-label="Select a value">
+            <SelectValue />
           </SelectTrigger>
           <SelectContent className="rounded-xl">
-            <SelectItem value="90d" className="rounded-lg">
-              Since Joined
+            <SelectItem value="sincejoined" className="rounded-lg">
+              By Days Since Joined
+            </SelectItem>
+            <SelectItem value="monthssincejoined" className="rounded-lg">
+              By Months Since Joined
             </SelectItem>
             <SelectItem value="30d" className="rounded-lg">
               Last 30 days
@@ -96,7 +92,7 @@ export function TotalMoneyChart({
           </SelectContent>
         </Select>
       </CardHeader>
-      <CardContent className="">
+      <CardContent>
         <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
           <AreaChart data={filteredData}>
             <defs>
@@ -144,7 +140,7 @@ export function TotalMoneyChart({
                 const date = new Date(value);
                 return date.toLocaleDateString("en-US", {
                   month: "short",
-                  day: "numeric",
+                  day: timeRange === "monthssincejoined" ? undefined : "numeric",
                 });
               }}
             />
@@ -155,7 +151,7 @@ export function TotalMoneyChart({
                   labelFormatter={(value) => {
                     return new Date(value).toLocaleDateString("en-US", {
                       month: "short",
-                      day: "numeric",
+                      day: timeRange === "monthssincejoined" ? undefined : "numeric",
                     });
                   }}
                   indicator="dot"
@@ -167,18 +163,21 @@ export function TotalMoneyChart({
               stroke="var(--chart-totalMoney)"
               fill="url(#totalMoney)"
               stackId="a"
+              isAnimationActive={false}
             />
             <Area
               dataKey="totalAdditions"
               stroke="var(--chart-totalAdditions)"
               fill="url(#totalAdditions)"
               stackId="b"
+              isAnimationActive={false}
             />
             <Area
               dataKey="totalDeductions"
               stroke="var(--chart-totalDeductions)"
               fill="url(#totalDeductions)"
               stackId="c"
+              isAnimationActive={false}
             />
 
             <ChartLegend content={<ChartLegendContent />} />

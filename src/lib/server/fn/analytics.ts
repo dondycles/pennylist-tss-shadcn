@@ -1,6 +1,13 @@
 import { authMiddleware } from "@/lib/middleware/auth-guard";
 import { createServerFn } from "@tanstack/react-start";
-import { differenceInDays } from "date-fns";
+import {
+  differenceInDays,
+  differenceInMonths,
+  getMonth,
+  getYear,
+  setDate,
+} from "date-fns";
+import _ from "lodash";
 import { getSupabaseServerClient } from "../supabase";
 
 export const getAnalytics = createServerFn({ method: "GET" })
@@ -17,8 +24,8 @@ export const getAnalytics = createServerFn({ method: "GET" })
 
     if (error) throw new Error(JSON.stringify(error, null, 2));
 
-    const daysSinceJoined = differenceInDays(new Date(), new Date(user.created_at));
-
+    const daysSinceJoined = differenceInDays(new Date(), user.created_at);
+    const monthsSinceJoined = differenceInMonths(new Date(), user.created_at);
     function groupLogsByDate() {
       if (!data) return [];
       const groupedByDate: { [key: string]: typeof data } = {};
@@ -96,5 +103,44 @@ export const getAnalytics = createServerFn({ method: "GET" })
       return summary;
     }
 
-    return groupLogsByDate();
+    function groupLogsByMonth() {
+      const groupedByMonth: { [key: string]: ReturnType<typeof groupLogsByDate> } = {};
+
+      const logsByDate = groupLogsByDate();
+      logsByDate.forEach((data) => {
+        if (!groupedByMonth[`${getMonth(data.date)}${getYear(data.date)}`]) {
+          groupedByMonth[`${getMonth(data.date)}${getYear(data.date)}`] = [data];
+        } else
+          groupedByMonth[`${getMonth(data.date)}${getYear(data.date)}`] = [
+            ...groupedByMonth[`${getMonth(data.date)}${getYear(data.date)}`],
+            data,
+          ];
+      });
+
+      const dateJoined = new Date(user.created_at);
+
+      const groupedByMonthArray: {
+        date: string;
+        totalMoney: number;
+        totalAdditions: number;
+        totalDeductions: number;
+      }[] = [];
+
+      for (let i = 0; i <= monthsSinceJoined; i++) {
+        const key = `${getMonth(dateJoined)}${getYear(dateJoined)}`;
+        groupedByMonthArray.push({
+          date: setDate(dateJoined, 1).toLocaleDateString(),
+          totalMoney: groupedByMonth[key].sort(
+            (a, b) => new Date(b.date).getDate() - new Date(a.date).getDate(),
+          )[0].totalMoney,
+          totalAdditions: _.sum(groupedByMonth[key].map((data) => data.totalAdditions)),
+          totalDeductions: _.sum(groupedByMonth[key].map((data) => data.totalDeductions)),
+        });
+        dateJoined.setDate(dateJoined.getMonth() + 1);
+      }
+      return groupedByMonthArray;
+    }
+    return { groupLogsByMonth: groupLogsByMonth(), groupLogsByDate: groupLogsByDate() };
   });
+
+export type Analytics = Awaited<ReturnType<typeof getAnalytics>>;
