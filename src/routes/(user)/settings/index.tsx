@@ -134,9 +134,9 @@ function SettingsComponent() {
   }
   return (
     <>
-      <div className="flex items-center gap-4 px-4">
-        <User2 className="size-10" />
-        <p className="truncate text-2xl font-bold sm:text-4xl">{user?.email}</p>
+      <div className="grid grid-cols-[24px_1fr] gap-4 px-4">
+        <User2 className="size-6" />
+        <p className="my-auto truncate font-bold">{user?.email}</p>
       </div>
       <div className="text-muted-foreground space-y-1 px-4 text-sm">
         <div>
@@ -286,8 +286,10 @@ function SettingBar({
       </div>
     );
   return (
-    <div className="bg-muted/50 flex items-center justify-between gap-4 rounded-3xl p-4">
-      <Label htmlFor={id}>{label}</Label>
+    <div className="bg-muted/50 grid grid-cols-[12fr_1fr] gap-4 rounded-3xl p-4">
+      <Label className="place-content-stretch truncate" htmlFor={id}>
+        {label}
+      </Label>
       {component ? component(id) : null}
     </div>
   );

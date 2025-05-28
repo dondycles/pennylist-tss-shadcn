@@ -125,7 +125,7 @@ export default function LogCard({
             </Table>
           </div>
         ) : null}
-        <div className="xs:grid-cols-[1fr_1fr] xs:grid-rows-1 mt-4 grid grid-rows-[1fr_1fr] gap-4">
+        <div className="mt-4 grid grid-rows-[1fr_1fr] gap-4 sm:grid-cols-[1fr_1fr] sm:grid-rows-1">
           <Data title="Previous" data={log.changes.prev} />
           <Data
             title="Current"
