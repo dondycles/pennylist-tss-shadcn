@@ -98,100 +98,155 @@ export function TotalMoneyChart({
             No data to show as of now
           </p>
         ) : (
-          <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
-            <AreaChart data={filteredData}>
-              <defs>
-                <linearGradient id="totalMoney" x1="0" y1="0" x2="0" y2="1">
-                  <stop
-                    offset="5%"
-                    stopColor="var(--chart-totalMoney)"
-                    stopOpacity={0.8}
-                  />
-                  <stop
-                    offset="95%"
-                    stopColor="var(--chart-totalMoney)"
-                    stopOpacity={0.1}
-                  />
-                </linearGradient>
-                <linearGradient id="totalAdditions" x1="0" y1="0" x2="0" y2="1">
-                  <stop
-                    offset="5%"
-                    stopColor="var(--chart-totalAdditions)"
-                    stopOpacity={0.8}
-                  />
-                  <stop
-                    offset="95%"
-                    stopColor="var(--chart-totalAdditions)"
-                    stopOpacity={0.1}
-                  />
-                </linearGradient>
-                <linearGradient id="totalDeductions" x1="0" y1="0" x2="0" y2="1">
-                  <stop
-                    offset="5%"
-                    stopColor="var(--chart-totalDeductions)"
-                    stopOpacity={0.8}
-                  />
-                  <stop
-                    offset="95%"
-                    stopColor="var(--chart-totalDeductions)"
-                    stopOpacity={0.1}
-                  />
-                </linearGradient>
-              </defs>
-              <CartesianGrid vertical={false} />
-              <XAxis
-                dataKey="date"
-                tickLine={false}
-                axisLine={false}
-                tickMargin={8}
-                minTickGap={32}
-                tickFormatter={(value) => {
-                  const date = new Date(value);
-                  return date.toLocaleDateString("en-US", {
-                    month: "short",
-                    day: timeRange === "monthssincejoined" ? undefined : "numeric",
-                  });
-                }}
-              />
-              <ChartTooltip
-                cursor={false}
-                content={
-                  <ChartTooltipContent
-                    labelFormatter={(value) => {
-                      return new Date(value).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: timeRange === "monthssincejoined" ? undefined : "numeric",
-                      });
-                    }}
-                    indicator="dot"
-                  />
-                }
-              />
-              <Area
-                dataKey="totalMoney"
-                stroke="var(--chart-totalMoney)"
-                fill="url(#totalMoney)"
-                stackId="a"
-                isAnimationActive={false}
-              />
-              <Area
-                dataKey="totalAdditions"
-                stroke="var(--chart-totalAdditions)"
-                fill="url(#totalAdditions)"
-                stackId="b"
-                isAnimationActive={false}
-              />
-              <Area
-                dataKey="totalDeductions"
-                stroke="var(--chart-totalDeductions)"
-                fill="url(#totalDeductions)"
-                stackId="c"
-                isAnimationActive={false}
-              />
+          <>
+            <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
+              <AreaChart data={filteredData}>
+                <defs>
+                  <linearGradient id="totalMoney" x1="0" y1="0" x2="0" y2="1">
+                    <stop
+                      offset="5%"
+                      stopColor="var(--chart-totalMoney)"
+                      stopOpacity={0.8}
+                    />
+                    <stop
+                      offset="95%"
+                      stopColor="var(--chart-totalMoney)"
+                      stopOpacity={0.1}
+                    />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid vertical={false} />
 
-              <ChartLegend content={<ChartLegendContent />} />
-            </AreaChart>
-          </ChartContainer>
+                <ChartTooltip
+                  cursor={false}
+                  content={
+                    <ChartTooltipContent
+                      labelFormatter={(value) => {
+                        return new Date(value).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: timeRange === "monthssincejoined" ? undefined : "numeric",
+                        });
+                      }}
+                      indicator="dot"
+                    />
+                  }
+                />
+                <Area
+                  dataKey="totalMoney"
+                  stroke="var(--chart-totalMoney)"
+                  fill="url(#totalMoney)"
+                  stackId="a"
+                  isAnimationActive={false}
+                  type="bump"
+                />
+
+                <ChartLegend content={<ChartLegendContent />} />
+              </AreaChart>
+            </ChartContainer>
+            <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
+              <AreaChart data={filteredData}>
+                <defs>
+                  <linearGradient id="totalAdditions" x1="0" y1="0" x2="0" y2="1">
+                    <stop
+                      offset="5%"
+                      stopColor="var(--chart-totalAdditions)"
+                      stopOpacity={0.8}
+                    />
+                    <stop
+                      offset="95%"
+                      stopColor="var(--chart-totalAdditions)"
+                      stopOpacity={0.1}
+                    />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid vertical={false} />
+
+                <ChartTooltip
+                  cursor={false}
+                  content={
+                    <ChartTooltipContent
+                      labelFormatter={(value) => {
+                        return new Date(value).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: timeRange === "monthssincejoined" ? undefined : "numeric",
+                        });
+                      }}
+                      indicator="dot"
+                    />
+                  }
+                />
+
+                <Area
+                  dataKey="totalAdditions"
+                  stroke="var(--chart-totalAdditions)"
+                  fill="url(#totalAdditions)"
+                  stackId="b"
+                  isAnimationActive={false}
+                  type="bump"
+                />
+
+                <ChartLegend content={<ChartLegendContent />} />
+              </AreaChart>
+            </ChartContainer>
+            <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
+              <AreaChart data={filteredData}>
+                <defs>
+                  <linearGradient id="totalDeductions" x1="0" y1="0" x2="0" y2="1">
+                    <stop
+                      offset="5%"
+                      stopColor="var(--chart-totalDeductions)"
+                      stopOpacity={0.8}
+                    />
+                    <stop
+                      offset="95%"
+                      stopColor="var(--chart-totalDeductions)"
+                      stopOpacity={0.1}
+                    />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid vertical={false} />
+                <XAxis
+                  dataKey="date"
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                  minTickGap={32}
+                  tickFormatter={(value) => {
+                    const date = new Date(value);
+                    return date.toLocaleDateString("en-US", {
+                      month: "short",
+                      day: timeRange === "monthssincejoined" ? undefined : "numeric",
+                    });
+                  }}
+                />
+                <ChartTooltip
+                  cursor={false}
+                  content={
+                    <ChartTooltipContent
+                      labelFormatter={(value) => {
+                        return new Date(value).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: timeRange === "monthssincejoined" ? undefined : "numeric",
+                        });
+                      }}
+                      indicator="dot"
+                    />
+                  }
+                />
+
+                <Area
+                  dataKey="totalDeductions"
+                  stroke="var(--chart-totalDeductions)"
+                  fill="url(#totalDeductions)"
+                  stackId="c"
+                  isAnimationActive={false}
+                  type="bump"
+                />
+
+                <ChartLegend content={<ChartLegendContent />} />
+              </AreaChart>
+            </ChartContainer>
+          </>
         )}
       </CardContent>
     </Card>
