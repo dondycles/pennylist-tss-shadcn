@@ -117,8 +117,7 @@ export const addMoney = createServerFn({ method: "POST" })
       })
       .select()
       .single();
-    if (error) throw new Error(JSON.stringify(error, null, 2));
-
+    if (error) throw new Error(error.message);
     if (insteredMoneyData)
       await addLog({
         data: {
@@ -149,7 +148,7 @@ export const editMoney = createServerFn({ method: "POST" })
       })
       .eq("id", current.id)
       .eq("userId", user.id);
-    if (error) throw new Error(JSON.stringify(error, null, 2));
+    if (error) throw new Error(error.message);
 
     await addLog({
       data: {
@@ -177,7 +176,7 @@ export const deleteMoney = createServerFn({ method: "POST" })
       .delete()
       .eq("id", moneyData.id)
       .eq("userId", user.id);
-    if (error) throw new Error(JSON.stringify(error, null, 2));
+    if (error) throw new Error(error.message);
 
     await addLog({
       data: {
@@ -217,7 +216,7 @@ export const transferMoneys = createServerFn({ method: "POST" })
       })
       .eq("id", sender.id)
       .eq("userId", user.id);
-    if (error) throw new Error(JSON.stringify(error, null, 2));
+    if (error) throw new Error(error.message);
 
     await addLog({
       data: {
@@ -248,7 +247,7 @@ export const transferMoneys = createServerFn({ method: "POST" })
         })
         .eq("id", receiver.id)
         .eq("userId", user.id);
-      if (error) throw new Error(JSON.stringify(error, null, 2));
+      if (error) throw new Error(error.message);
 
       await addLog({
         data: {

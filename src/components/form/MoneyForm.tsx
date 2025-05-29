@@ -19,6 +19,7 @@ import { useMoneyState } from "@/lib/stores/money-state";
 import { useRouteContext } from "@tanstack/react-router";
 import { Loader2, RotateCw } from "lucide-react";
 import { useRef } from "react";
+import { toast } from "sonner";
 import ActionConfirmDialog from "../ActionConfirmDialog";
 import Amount from "../Amount";
 import ColorPicker from "../ColorPickerDialog";
@@ -70,6 +71,8 @@ export default function MoneyForm({
       return await addMoney({ data: { ...money, totalMoney } });
     },
     onSuccess: () => {
+      toast.success(initialData ? "Edit Succesful" : "Money Added");
+
       if (deepView) {
         if (initialData)
           queryClient.invalidateQueries({ queryKey: ["money", initialData.id] });
@@ -79,7 +82,7 @@ export default function MoneyForm({
       close();
     },
     onError: (e) => {
-      moneyForm.setError("color", { message: e.message });
+      toast.error(e.message);
     },
   });
 

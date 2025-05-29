@@ -46,7 +46,7 @@ export const addLog = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const supabase = getSupabaseServerClient();
     const { error } = await supabase.from("log").insert(data);
-    if (error) throw new Error(JSON.stringify(error, null, 2));
+    if (error) throw new Error(error.message);
   });
 
 export const getLogs = createServerFn({ method: "GET" })

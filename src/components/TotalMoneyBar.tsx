@@ -5,6 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouteContext } from "@tanstack/react-router";
 import _ from "lodash";
 import { Loader2, RotateCw, Send, X } from "lucide-react";
+import { toast } from "sonner";
 import ActionConfirmDialog from "./ActionConfirmDialog";
 import Amount from "./Amount";
 import MoneyTransferCard from "./MoneyTransferCard";
@@ -33,10 +34,14 @@ export default function TotalMoneyBar() {
       });
     },
     onSuccess: async () => {
+      toast.success("Transferred Succesfully");
       await queryClient.invalidateQueries({
         queryKey: ["moneys", user?.id ?? "no-user"],
       });
       cancel();
+    },
+    onError: (e) => {
+      toast.error(e.message);
     },
   });
 

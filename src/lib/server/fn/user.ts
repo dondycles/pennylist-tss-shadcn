@@ -63,17 +63,16 @@ export const updateUserSettings = createServerFn({ method: "POST" })
       const supabase = getSupabaseServerClient();
       const { error } = await supabase
         .from("setting")
-        .upsert({
+        .update({
           asterisk: data.asterisk,
           flow: data.flow,
           sortBy: data.sortBy,
           theme: data.theme,
-          id: id,
           updated_at: new Date().toISOString(),
           PIN: data.PIN,
         })
         .eq("userId", id);
-      if (error) throw new Error(JSON.stringify(error, null, 2));
+      if (error) throw new Error(error.message);
     },
   );
 
@@ -95,7 +94,7 @@ export const initiateUserSettings = createServerFn({ method: "POST" })
       updated_at: new Date().toISOString(),
       userId: user.id,
     });
-    if (error) throw new Error(JSON.stringify(error, null, 2));
+    if (error) throw new Error(error.message);
   });
 
 export const getUserPIN = createServerFn({ method: "GET" })

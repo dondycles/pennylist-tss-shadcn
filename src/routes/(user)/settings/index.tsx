@@ -60,6 +60,7 @@ import { OTPInput } from "input-otp";
 import { Settings } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 export const Route = createFileRoute("/(user)/settings/")({
   component: RouteComponent,
@@ -110,9 +111,13 @@ function SettingsComponent() {
       });
     },
     onSuccess: () => {
+      toast.success("Settings Updated");
       setOpenPINDialog(false);
       settings.refetch();
       queryClient.invalidateQueries({ queryKey: ["moneys", user?.id] });
+    },
+    onError: (e) => {
+      toast.error(e.message);
     },
   });
 

@@ -5,6 +5,7 @@ import { useTransferState } from "@/lib/stores/transfer-state";
 import { QueryClient, useMutation } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { ExternalLink, Pencil, PlaneLanding, Send, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import ActionConfirmDialog from "./ActionConfirmDialog";
 import Amount from "./Amount";
 import MoneyFormDialog from "./MoneyFormDialog";
@@ -47,6 +48,7 @@ export default function MoneyCard({
         },
       }),
     onSuccess: () => {
+      toast.success("Money Deleted");
       if (deepView) {
         location.reload();
       } else {
@@ -55,6 +57,9 @@ export default function MoneyCard({
             queryKey: ["moneys", user.id],
           });
       }
+    },
+    onError: (e) => {
+      toast.error(e.message);
     },
   });
 
