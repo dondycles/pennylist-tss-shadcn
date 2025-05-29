@@ -9,7 +9,13 @@ import { addLog } from "./logs";
 export const moneySchema = z.object({
   name: z.string().min(1),
   amount: z.coerce.number().nonnegative(),
-  color: z.string().optional().nullable(),
+  color: z
+    .string()
+    .regex(/^#?([0-9a-fA-F]{6})$/, {
+      message: "Color must be a 6-digit HEX (with #)",
+    })
+    .optional()
+    .nullable(),
   reason: z.string().optional().nullable(),
 });
 export const moneyWithIdSchema = moneySchema.extend({ id: z.string() });
