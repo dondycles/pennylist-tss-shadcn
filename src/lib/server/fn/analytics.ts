@@ -16,7 +16,7 @@ export const getAnalytics = createServerFn({ method: "GET" })
     const supabase = getSupabaseServerClient();
     const { data, error } = await supabase
       .from("log")
-      .select("*, money!inner(*)")
+      .select("*, money(*)")
       .eq("userId", user.id)
       .order("created_at", {
         ascending: false,
