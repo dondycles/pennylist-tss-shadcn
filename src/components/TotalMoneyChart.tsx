@@ -33,10 +33,10 @@ const chartConfig = {
     label: "Total",
   },
   totalAdditions: {
-    label: "Credit",
+    label: "Incomings",
   },
   totalDeductions: {
-    label: "Debit",
+    label: "Outgoings",
   },
 } satisfies ChartConfig;
 
@@ -69,8 +69,10 @@ export function TotalMoneyChart({
     <Card className="bg-transparent p-0 pb-4">
       <CardHeader className="flex items-center gap-2 space-y-0 p-0 px-4 sm:flex-row">
         <div className="grid flex-1 gap-1">
-          <CardTitle>Total Money</CardTitle>
-          <CardDescription>Showing total money each day since joined</CardDescription>
+          <CardTitle>Changes</CardTitle>
+          <CardDescription>
+            Showing the flow of your incoming, outgoing, and total money.
+          </CardDescription>
         </div>
         <Select value={timeRange} onValueChange={setTimeRange}>
           <SelectTrigger className="rounded-lg sm:ml-auto" aria-label="Select a value">
