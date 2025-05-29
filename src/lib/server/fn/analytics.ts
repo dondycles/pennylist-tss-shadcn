@@ -27,7 +27,7 @@ export const getAnalytics = createServerFn({ method: "GET" })
     const daysSinceJoined = differenceInDays(new Date(), user.created_at);
     const monthsSinceJoined = differenceInMonths(new Date(), user.created_at);
     function groupLogsByDate() {
-      if (!data) return [];
+      if (!data?.length) return null;
       const groupedByDate: { [key: string]: typeof data } = {};
       data.forEach((log) => {
         const day = new Date(log.created_at).toLocaleDateString();
@@ -104,9 +104,14 @@ export const getAnalytics = createServerFn({ method: "GET" })
     }
 
     function groupLogsByMonth() {
-      const groupedByMonth: { [key: string]: ReturnType<typeof groupLogsByDate> } = {};
+      const groupedByMonth: {
+        [key: string]: NonNullable<ReturnType<typeof groupLogsByDate>>;
+      } = {};
 
       const logsByDate = groupLogsByDate();
+
+      if (!logsByDate) return null;
+
       logsByDate.forEach((data) => {
         if (!groupedByMonth[`${getMonth(data.date)}${getYear(data.date)}`]) {
           groupedByMonth[`${getMonth(data.date)}${getYear(data.date)}`] = [data];

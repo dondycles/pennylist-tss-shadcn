@@ -73,12 +73,16 @@ function RouteComponent() {
         />
       </div>
       <Suspense
-        fallback={<p className="text-muted-foreground text-center">Getting moneys...</p>}
+        fallback={
+          <p className="text-muted-foreground text-center text-sm">Getting moneys...</p>
+        }
       >
         <MoneyIds />
       </Suspense>
       <Suspense
-        fallback={<p className="text-muted-foreground text-center">Getting logs...</p>}
+        fallback={
+          <p className="text-muted-foreground text-center text-sm">Getting logs...</p>
+        }
       >
         <Logs />
       </Suspense>

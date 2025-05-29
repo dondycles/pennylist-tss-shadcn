@@ -18,6 +18,7 @@ import { useMoneyState } from "@/lib/stores/money-state";
 import { useRouteContext } from "@tanstack/react-router";
 import { Loader2, RotateCw } from "lucide-react";
 import ActionConfirmDialog from "../ActionConfirmDialog";
+import Amount from "../Amount";
 import ColorPicker from "../ColorPickerDialog";
 import MoneyInput from "../MoneyInput";
 import { DialogClose } from "../ui/dialog";
@@ -102,13 +103,26 @@ export default function MoneyForm({
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <MoneyInput
-                  style={{ color: moneyForm.watch("color") ?? "var(--foreground)" }}
-                  className="w-full"
-                  type="number"
-                  placeholder="Amount"
-                  {...field}
-                />
+                <div>
+                  <MoneyInput
+                    style={{ color: moneyForm.watch("color") ?? "var(--foreground)" }}
+                    className="w-full"
+                    type="number"
+                    placeholder="Amount"
+                    {...field}
+                  />
+
+                  {initialData ? (
+                    <div className="mt-2 text-sm">
+                      <span className="text-muted-foreground">Difference:</span>
+                      <Amount
+                        className={`ml-1 text-sm font-normal ${field.value - initialData.amount === 0 ? "" : field.value - initialData.amount > 0 ? "text-green-500" : "text-destructive"}`}
+                        amount={field.value - initialData.amount}
+                        settings={{ sign: true }}
+                      />
+                    </div>
+                  ) : null}
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -130,7 +144,7 @@ export default function MoneyForm({
                       {...field}
                       value={field.value ?? ""}
                     />
-                    {field.value ? (
+                    {!initialData && field.value ? (
                       <Button
                         variant={"outline"}
                         size="icon"

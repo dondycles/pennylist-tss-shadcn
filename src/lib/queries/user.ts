@@ -17,7 +17,7 @@ export const userPINQueryOptions = () =>
   queryOptions({
     queryKey: ["user-pin"],
     queryFn: async ({ signal }) => {
-      const { PIN } = await getUserPIN({ signal });
+      const PIN = await getUserPIN({ signal });
       return PIN;
     },
   });

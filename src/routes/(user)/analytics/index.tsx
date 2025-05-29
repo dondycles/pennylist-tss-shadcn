@@ -58,5 +58,6 @@ function Analytics({ user }: { user: NonNullable<GetUser> }) {
     ...analyticsQueryOptions(user?.id),
     staleTime: 0,
   });
+
   return <TotalMoneyChart data={analytics.data} dateJoined={new Date(user.createdAt)} />;
 }

@@ -77,7 +77,7 @@ function RouteComponent() {
       </div>
       <Suspense
         fallback={
-          <p className="text-muted-foreground text-center">Getting settings...</p>
+          <p className="text-muted-foreground text-center text-sm">Getting settings...</p>
         }
       >
         <SettingsComponent />
@@ -148,7 +148,7 @@ function SettingsComponent() {
         <div>
           <span>Last update </span>
           <TimeInfo
-            createdAt={settings.data?.updated_at ?? new Date().toLocaleString()}
+            createdAt={settings.data.updated_at ?? new Date().toLocaleString()}
           />{" "}
           <History className="text-gree inline size-4" />
         </div>

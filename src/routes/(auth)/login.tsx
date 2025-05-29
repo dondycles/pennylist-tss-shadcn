@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { initiateUserSettings } from "@/lib/server/fn/user";
 import { getSupabaseServerClient } from "@/lib/server/supabase";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
@@ -50,7 +49,6 @@ function LoginForm() {
       window.location.reload();
       return;
     }
-    await initiateUserSettings();
     setIsLoading(false);
     setErrorMessage(data.message);
   };

@@ -29,7 +29,22 @@ export const getUserSettings = createServerFn({ method: "GET" })
       const supabase = getSupabaseServerClient();
       const { data, error } = await supabase.from("setting").select().eq("userId", id);
       if (error) throw new Error(JSON.stringify(error, null, 2));
-      return data[0];
+
+      if (!data[0]) {
+        const { error, data } = await supabase
+          .from("setting")
+          .insert({
+            asterisk: false,
+            flow: "desc",
+            sortBy: "date",
+            theme: "dark",
+            updated_at: new Date().toISOString(),
+            userId: id,
+          })
+          .select();
+        if (error) throw new Error(JSON.stringify(error, null, 2));
+        return data[0];
+      } else return data[0];
     },
   );
 
@@ -64,24 +79,24 @@ export const updateUserSettings = createServerFn({ method: "POST" })
 
 export const initiateUserSettings = createServerFn({ method: "POST" })
   .middleware([authMiddleware])
-  .handler(
-    async ({
-      context: {
-        user: { id },
-      },
-    }) => {
-      const supabase = getSupabaseServerClient();
-      const { error } = await supabase.from("setting").insert({
-        asterisk: false,
-        flow: "desc",
-        sortBy: "date",
-        theme: "dark",
-        updated_at: new Date().toISOString(),
-        userId: id,
-      });
-      if (error) throw new Error(JSON.stringify(error, null, 2));
-    },
-  );
+  .handler(async ({ context: { user } }) => {
+    const supabase = getSupabaseServerClient();
+    const existing = await supabase
+      .from("setting")
+      .select("id")
+      .eq("userId", user.id)
+      .single();
+    if (existing.data) return;
+    const { error } = await supabase.from("setting").insert({
+      asterisk: false,
+      flow: "desc",
+      sortBy: "date",
+      theme: "dark",
+      updated_at: new Date().toISOString(),
+      userId: user.id,
+    });
+    if (error) throw new Error(JSON.stringify(error, null, 2));
+  });
 
 export const getUserPIN = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
@@ -92,12 +107,11 @@ export const getUserPIN = createServerFn({ method: "GET" })
       },
     }) => {
       const supabase = getSupabaseServerClient();
-      const { error, data } = await supabase
+      const { data } = await supabase
         .from("setting")
         .select("PIN")
         .eq("userId", id)
         .single();
-      if (error) throw new Error(JSON.stringify(error, null, 2));
-      return data;
+      return data?.PIN ?? null;
     },
   );

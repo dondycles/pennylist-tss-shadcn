@@ -21,7 +21,6 @@ export const Route = createFileRoute("/(user)")({
       });
     }
     const PIN = await context.queryClient.fetchQuery(userPINQueryOptions());
-
     return {
       redirectUrl: REDIRECT_URL,
       PIN,
