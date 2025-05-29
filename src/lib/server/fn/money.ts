@@ -182,10 +182,15 @@ export const deleteMoney = createServerFn({ method: "POST" })
             color: "",
             totalMoney: moneyData.totalMoney - moneyData.amount,
           },
-          prev: moneyData,
+          prev: {
+            amount: moneyData.amount,
+            name: moneyData.name,
+            color: moneyData.color,
+            totalMoney: moneyData.totalMoney,
+          },
         },
-        moneyId: moneyData.id,
-        type: "edit",
+        moneyId: null,
+        type: "delete",
         reason: "Deletion",
       },
     });

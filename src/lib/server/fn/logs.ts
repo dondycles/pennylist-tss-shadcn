@@ -4,7 +4,7 @@ import { z } from "zod";
 import { getSupabaseServerClient } from "../supabase";
 
 const baseMoneySchema = z.object({
-  name: z.string().min(1),
+  name: z.string(),
   amount: z.coerce.number().nonnegative(),
   color: z.string().optional().nullable(),
 });
@@ -24,7 +24,7 @@ const receiverSchema = baseMoneySchema.extend({
 });
 
 export const logSchema = z.object({
-  moneyId: z.string(),
+  moneyId: z.string().nullable(),
   type: z.enum(["edit", "transfer", "delete", "add"]),
   changes: z.object({
     prev: moneyWithTotalSchema,
@@ -65,7 +65,7 @@ export const getLogs = createServerFn({ method: "GET" })
     const page = typeof pageParam === "number" ? pageParam : 0;
     let query = supabase
       .from("log")
-      .select("*, money!inner(*)")
+      .select("*, money(*)")
       .eq("userId", user.id)
       .order("created_at", {
         ascending: flow === "asc" ? true : false,

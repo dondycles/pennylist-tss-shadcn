@@ -18,7 +18,7 @@ export default function LogCard({
   log,
 }: {
   log: Database["public"]["Tables"]["log"]["Row"] & {
-    money: Database["public"]["Tables"]["money"]["Row"];
+    money: Database["public"]["Tables"]["money"]["Row"] | null;
   };
 }) {
   const isReceiver =
@@ -62,9 +62,14 @@ export default function LogCard({
             : log.type}
         </p>
         <div className="text-muted-foreground mt-1 flex items-center gap-1 text-sm">
-          <Link to="/list/$id" params={{ id: log.moneyId as string }}>
+          <Link
+            className={`${!log.money && "text-destructive"}`}
+            disabled={!log.money}
+            to="/list/$id"
+            params={{ id: log.moneyId as string }}
+          >
             <Banknote className="inline size-4" />
-            <span className="ml-1 inline text-sm">{log.money?.name}</span>
+            <span className="ml-1 inline text-sm">{log.money?.name ?? "Deleted"}</span>
           </Link>
           |
           <Clock className="size-4" />

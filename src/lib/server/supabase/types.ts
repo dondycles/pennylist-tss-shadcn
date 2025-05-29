@@ -61,7 +61,8 @@ export type Database = {
           changes: Changes;
           created_at: string;
           id: string;
-          moneyId: string;
+          moneyId: string | null;
+
           reason: string | null;
           transferDetails: TransferDetails | null;
           type: string;
@@ -71,7 +72,8 @@ export type Database = {
           changes: Changes;
           created_at?: string;
           id?: string;
-          moneyId: string;
+          moneyId?: string | null;
+
           reason?: string | null;
           transferDetails?: TransferDetails | null;
           type: string;
@@ -81,7 +83,8 @@ export type Database = {
           changes?: Changes;
           created_at?: string;
           id?: string;
-          moneyId?: string;
+          moneyId?: string | null;
+
           reason?: string | null;
           transferDetails?: TransferDetails | null;
           type?: string;
