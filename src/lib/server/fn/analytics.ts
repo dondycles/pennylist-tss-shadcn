@@ -1,7 +1,7 @@
 import { authMiddleware } from "@/lib/middleware/auth-guard";
 import { createServerFn } from "@tanstack/react-start";
 import {
-  differenceInDays,
+  differenceInCalendarDays,
   differenceInMonths,
   getMonth,
   getYear,
@@ -24,7 +24,7 @@ export const getAnalytics = createServerFn({ method: "GET" })
 
     if (error) throw new Error(JSON.stringify(error, null, 2));
 
-    const daysSinceJoined = differenceInDays(new Date(), user.created_at);
+    const daysSinceJoined = differenceInCalendarDays(new Date(), user.created_at);
     const monthsSinceJoined = differenceInMonths(new Date(), user.created_at);
     function groupLogsByDate() {
       if (!data?.length) return null;

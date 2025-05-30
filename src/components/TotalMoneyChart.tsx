@@ -26,7 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Analytics } from "@/lib/server/fn/analytics";
-import { differenceInDays } from "date-fns";
+import { differenceInCalendarDays } from "date-fns";
 
 const chartConfig = {
   totalMoney: {
@@ -55,7 +55,7 @@ export function TotalMoneyChart({
       : data.groupLogsByDate?.filter((item) => {
           const date = new Date(item.date);
           const referenceDate = new Date();
-          let daysToSubtract = differenceInDays(new Date(), dateJoined) + 1;
+          let daysToSubtract = differenceInCalendarDays(new Date(), dateJoined);
           if (timeRange === "30d") {
             daysToSubtract = 30 < daysToSubtract ? 30 : daysToSubtract;
           } else if (timeRange === "7d") {
