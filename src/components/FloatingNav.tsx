@@ -3,7 +3,6 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { Activity, FileClock, List, Plus, Settings } from "lucide-react";
 import { MotionHighlight } from "./animate-ui/effects/motion-highlight";
 import MoneyFormDialog from "./MoneyFormDialog";
-import TooltipComp from "./TooltipComp";
 import { Button } from "./ui/button";
 export default function FloatingNav() {
   const floatingNavState = useFloatingNavState();
@@ -15,81 +14,71 @@ export default function FloatingNav() {
         className="bg-foreground/10 rounded-full"
       >
         <div key="/list" data-value="/list">
-          <TooltipComp content="Add money" asChild={true}>
-            <MoneyFormDialog
-              deepView={false}
-              desc="It's always nice to have new money."
-              title="Add Money"
-            >
-              <Button
-                hidden={!floatingNavState.showAddMoneyBtn}
-                type="button"
-                size="icon"
-                className="-ml-2 size-12"
-              >
-                <Plus className="size-5" />
-              </Button>
-            </MoneyFormDialog>
-          </TooltipComp>
-          <TooltipComp content="View all money">
+          <MoneyFormDialog
+            deepView={false}
+            desc="It's always nice to have new money."
+            title="Add Money"
+          >
             <Button
-              asChild
-              hidden={floatingNavState.showAddMoneyBtn}
+              hidden={!floatingNavState.showAddMoneyBtn}
               type="button"
-              size={"icon"}
-              variant={"ghost"}
-              className="hover:bg-transparent"
+              size="icon"
+              className="-ml-2 size-12"
             >
-              <Link to="/list">
-                <List className="size-5" />
-              </Link>
+              <Plus className="size-5" />
             </Button>
-          </TooltipComp>
+          </MoneyFormDialog>
+          <Button
+            asChild
+            hidden={floatingNavState.showAddMoneyBtn}
+            type="button"
+            size={"icon"}
+            variant={"ghost"}
+            className="hover:bg-transparent"
+          >
+            <Link to="/list">
+              <List className="size-5" />
+            </Link>
+          </Button>
         </div>
 
         <div key="/logs" data-value="/logs">
-          <TooltipComp content="View logs">
-            <Button
-              className="hover:bg-transparent"
-              asChild
-              type="button"
-              size={"icon"}
-              variant={"ghost"}
-            >
-              <Link to="/logs" search={{ flow: "desc" }}>
-                <FileClock className="size-5" />
-              </Link>
-            </Button>
-          </TooltipComp>
+          <Button
+            className="hover:bg-transparent"
+            asChild
+            type="button"
+            size={"icon"}
+            variant={"ghost"}
+          >
+            <Link to="/logs" search={{ flow: "desc" }}>
+              <FileClock className="size-5" />
+            </Link>
+          </Button>
         </div>
         <div key="/analytics" data-value="/analytics">
-          <TooltipComp content="View analytics">
-            <Button
-              className="hover:bg-transparent"
-              asChild
-              type="button"
-              size={"icon"}
-              variant={"ghost"}
-            >
-              <Link to="/analytics">
-                <Activity className="size-5" />
-              </Link>
-            </Button>
-          </TooltipComp>
+          <Button
+            className="hover:bg-transparent"
+            asChild
+            type="button"
+            size={"icon"}
+            variant={"ghost"}
+          >
+            <Link to="/analytics">
+              <Activity className="size-5" />
+            </Link>
+          </Button>
         </div>
         <div key="/settings" data-value="/settings">
-          <TooltipComp content="Settings">
-            <Button
-              className="hover:bg-transparent"
-              asChild
-              size={"icon"}
-              variant={"ghost"}
-            >
-              <Link to="/settings">
-                <Settings className="size-5" />
-              </Link>
-            </Button>
-          </TooltipComp>
+          <Button
+            className="hover:bg-transparent"
+            asChild
+            size={"icon"}
+            variant={"ghost"}
+          >
+            <Link to="/settings">
+              <Settings className="size-5" />
+            </Link>
+          </Button>
         </div>
       </MotionHighlight>
     </nav>
