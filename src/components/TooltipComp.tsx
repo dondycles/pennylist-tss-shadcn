@@ -1,9 +1,4 @@
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/animate-ui/radix/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export default function TooltipComp({
   content,
@@ -15,11 +10,9 @@ export default function TooltipComp({
   asChild?: boolean;
 }) {
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild={asChild}>{children}</TooltipTrigger>
-        <TooltipContent>{content}</TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Tooltip>
+      <TooltipTrigger asChild={asChild}>{children}</TooltipTrigger>
+      <TooltipContent>{content}</TooltipContent>
+    </Tooltip>
   );
 }
