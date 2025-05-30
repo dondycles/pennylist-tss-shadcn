@@ -19,9 +19,17 @@ export default function TotalMoneyBar() {
   const cashIns = _.sum(receivers?.map((r) => r.cashIn ?? 0));
   const invalid = (sender?.amount ?? 0) - fees - cashIns < 0;
   const handleTransfer = useMutation({
+    mutationKey: ["transfer-moneys", user?.id ?? "no-user"],
     mutationFn: async () => {
-      if (!sender) return;
-      if (!receivers) return;
+      if (!sender) {
+        throw new Error("No sender");
+      }
+      if (!receivers) {
+        throw new Error("No receivers");
+      }
+      if (!receivers.some((r) => (r.cashIn as number) > 0)) {
+        throw new Error("No receivers with cashIn amount greater than 0");
+      }
       return transferMoneys({
         data: {
           receivers,
@@ -80,7 +88,11 @@ export default function TotalMoneyBar() {
                   desc="Are you sure to transfer funds?"
                 >
                   <Button
-                    disabled={invalid || handleTransfer.isPending}
+                    disabled={
+                      invalid ||
+                      handleTransfer.isPending ||
+                      !receivers.some((r) => (r.cashIn as number) > 0)
+                    }
                     variant={"ghost"}
                   >
                     {handleTransfer.isPending ? (
@@ -112,7 +124,7 @@ export default function TotalMoneyBar() {
         </>
       ) : (
         <div className="space-y-1">
-          <p className="text-muted-foreground">Total money</p>
+          <p className="text-muted-foreground">Total Money</p>
           <Amount
             className="mx-auto truncate text-4xl font-bold"
             amount={total}

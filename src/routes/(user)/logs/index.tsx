@@ -106,7 +106,7 @@ function SearchInput() {
         onChange={(e) => debouncedSearch(e.currentTarget.value)}
       />
       <Dialog>
-        <DialogTrigger className="text-muted-foreground flex items-center gap-2 rounded-s-none rounded-e-full border pr-4 pl-3 text-sm">
+        <DialogTrigger className="text-muted-foreground flex items-center gap-2 rounded-s-none rounded-e-full border border-l-transparent pr-4 pl-3 text-sm">
           <Filter className="size-4" />
           <span>Filter</span>
         </DialogTrigger>
