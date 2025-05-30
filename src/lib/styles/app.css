@@ -3,7 +3,6 @@
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
-@custom-variant hover (&:hover);
 
 .lexend {
   font-family: "Lexend", sans-serif;
