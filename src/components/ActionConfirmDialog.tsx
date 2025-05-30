@@ -31,12 +31,12 @@ export default function ActionConfirmDialog({
         </DialogHeader>
         <DialogFooter className="flex w-full flex-row">
           <DialogClose className="flex-1">
-            <Button className="w-full" variant={"destructive"}>
+            <Button className="w-full" variant={"secondary"}>
               Cancel
             </Button>
           </DialogClose>
           <DialogClose className="flex-1">
-            <Button variant={"ghost"} className="w-full" onClick={() => confirm()}>
+            <Button variant={"destructive"} className="w-full" onClick={() => confirm()}>
               Confirm
             </Button>
           </DialogClose>
