@@ -125,26 +125,6 @@ export function TotalMoneyChart({
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
-
-        {/* <Select value={timeRange} onValueChange={setTimeRange}>
-          <SelectTrigger className="rounded-full sm:ml-auto" aria-label="Select a value">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent className="rounded-xl">
-            <SelectItem value="sincejoined" className="rounded-lg">
-              By Days Since Joined
-            </SelectItem>
-            <SelectItem value="monthssincejoined" className="rounded-lg">
-              By Months Since Joined
-            </SelectItem>
-            <SelectItem value="30d" className="rounded-lg">
-              Last 30 days
-            </SelectItem>
-            <SelectItem value="7d" className="rounded-lg">
-              Last 7 days
-            </SelectItem>
-          </SelectContent>
-        </Select> */}
       </CardHeader>
       <CardContent>
         {!filteredData ? (
@@ -153,7 +133,7 @@ export function TotalMoneyChart({
           </p>
         ) : (
           <>
-            <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
+            <ChartContainer config={chartConfig} className="aspect-auto h-[150px] w-full">
               <AreaChart data={filteredData}>
                 <defs>
                   <linearGradient id="totalMoney" x1="0" y1="0" x2="0" y2="1">
@@ -211,7 +191,7 @@ export function TotalMoneyChart({
                 <ChartLegend content={<ChartLegendContent />} />
               </AreaChart>
             </ChartContainer>
-            <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
+            <ChartContainer config={chartConfig} className="aspect-auto h-[150px] w-full">
               <AreaChart data={filteredData}>
                 <defs>
                   <linearGradient id="totalAdditions" x1="0" y1="0" x2="0" y2="1">
@@ -270,7 +250,7 @@ export function TotalMoneyChart({
                 <ChartLegend content={<ChartLegendContent />} />
               </AreaChart>
             </ChartContainer>
-            <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
+            <ChartContainer config={chartConfig} className="aspect-auto h-[150px] w-full">
               <AreaChart data={filteredData}>
                 <defs>
                   <linearGradient id="totalDeductions" x1="0" y1="0" x2="0" y2="1">
