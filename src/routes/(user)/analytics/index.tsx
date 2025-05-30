@@ -10,6 +10,7 @@ export const Route = createFileRoute("/(user)/analytics/")({
   },
 });
 
+import TooltipComp from "@/components/TooltipComp";
 import { TotalMoneyChart } from "@/components/TotalMoneyChart";
 import { Skeleton } from "@/components/ui/skeleton";
 import { analyticsQueryOptions } from "@/lib/queries/analytics";
@@ -27,9 +28,11 @@ function RouteComponent() {
             <Activity />
             <p>Analytics</p>
           </div>
-          <button onClick={() => location.reload()} type="button">
-            <RefreshCw className="size-4" />
-          </button>
+          <TooltipComp content="Refresh" asChild>
+            <button onClick={() => location.reload()} type="button">
+              <RefreshCw className="size-4" />
+            </button>
+          </TooltipComp>
         </div>
         <Suspense
           fallback={
