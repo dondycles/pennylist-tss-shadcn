@@ -31,7 +31,6 @@ function RouteComponent() {
             <RefreshCw className="size-4" />
           </button>
         </div>
-
         <Suspense
           fallback={
             <div className="w-full px-4">
