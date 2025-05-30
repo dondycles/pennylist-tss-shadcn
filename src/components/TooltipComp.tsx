@@ -15,7 +15,7 @@ export default function TooltipComp({
   asChild?: boolean;
 }) {
   return (
-    <TooltipProvider delayDuration={500}>
+    <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild={asChild}>{children}</TooltipTrigger>
         <TooltipContent>{content}</TooltipContent>
