@@ -127,7 +127,7 @@ export function TotalMoneyChart({
         </DropdownMenu>
       </CardHeader>
       <CardContent>
-        {!filteredData ? (
+        {!filteredData?.length ? (
           <p className="text-muted-foreground text-center text-sm">
             No data to show as of now
           </p>
