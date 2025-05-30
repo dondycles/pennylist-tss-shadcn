@@ -9,7 +9,6 @@ import {
 import LogCard from "@/components/LogCard";
 import PageStatusSetter from "@/components/PageStatusSetter";
 import Scrollable from "@/components/Scrollable";
-import TooltipComp from "@/components/TooltipComp";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -54,11 +53,9 @@ function RouteComponent() {
           <FileClock />
           <p>Logs </p>
         </div>
-        <TooltipComp content="Refresh" asChild>
-          <button onClick={() => location.reload()} type="button">
-            <RefreshCw className="size-4" />
-          </button>
-        </TooltipComp>
+        <button onClick={() => location.reload()} type="button">
+          <RefreshCw className="size-4" />
+        </button>
       </div>
       <SearchInput />
       <Suspense
