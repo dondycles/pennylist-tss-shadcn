@@ -90,13 +90,13 @@ export function TotalMoneyChart({
           <DropdownMenuContent align="end">
             <DropdownMenuGroup>
               <DropdownMenuItem onClick={() => setFilter({ type: "daily", freq: "7" })}>
-                <p className="flex-1">Daily</p>
+                <p className="flex-1 text-left">Daily</p>
                 {filter.type === "daily" ? <Check /> : null}
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => setFilter({ type: "monthly", freq: "sincejoined" })}
               >
-                <p className="flex-1"> Monthly</p>
+                <p className="flex-1 text-left"> Monthly</p>
                 {filter.type === "monthly" ? <Check /> : null}
               </DropdownMenuItem>
             </DropdownMenuGroup>
@@ -106,20 +106,20 @@ export function TotalMoneyChart({
                 onClick={() => setFilter({ freq: "7", type: "daily" })}
                 hidden={filter.type === "monthly"}
               >
-                <p className="flex-1">7</p>
+                <p className="flex-1 text-left">7</p>
                 {filter.type === "daily" && filter.freq === "7" ? <Check /> : null}
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => setFilter({ freq: "30", type: "daily" })}
                 hidden={filter.type === "monthly"}
               >
-                <p className="flex-1">30</p>
+                <p className="flex-1 text-left">30</p>
                 {filter.type === "daily" && filter.freq === "30" ? <Check /> : null}
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => setFilter({ freq: "sincejoined", type: filter.type })}
               >
-                <p className="flex-1">Since Joined</p>
+                <p className="flex-1 text-left">Since Joined</p>
                 {filter.freq === "sincejoined" ? <Check /> : null}
               </DropdownMenuItem>
             </DropdownMenuGroup>
