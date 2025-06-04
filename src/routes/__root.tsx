@@ -55,21 +55,6 @@ export const Route = createRootRouteWithContext<{
 });
 
 function RootComponent() {
-  useEffect(() => {
-    const loadSerwist = async () => {
-      if ("serviceWorker" in navigator) {
-        const serwist = await getSerwist();
-
-        serwist?.addEventListener("installed", () => {
-          console.log("Serwist installed!");
-        });
-
-        void serwist?.register();
-      }
-    };
-
-    loadSerwist();
-  }, []);
   return (
     <RootDocument>
       <Outlet />
@@ -78,6 +63,28 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: { readonly children: React.ReactNode }) {
+  useEffect(() => {
+    let serwist: Awaited<ReturnType<typeof getSerwist>> | undefined;
+    const onInstalled = () => {
+      console.log("Serwist installed!");
+    };
+
+    const loadSerwist = async () => {
+      if ("serviceWorker" in navigator) {
+        serwist = await getSerwist();
+
+        serwist?.addEventListener("installed", onInstalled);
+
+        void serwist?.register();
+      }
+    };
+
+    loadSerwist();
+
+    return () => {
+      serwist?.removeEventListener("installed", onInstalled);
+    };
+  }, []);
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
