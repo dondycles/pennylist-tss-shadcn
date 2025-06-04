@@ -81,6 +81,7 @@ export const getMoney = createServerFn({ method: "GET" })
         .select("*, log(*)")
         .eq("userId", userId)
         .eq("id", id)
+        .order("created_at", { referencedTable: "log", ascending: false })
         .single();
       if (error) throw new Error(JSON.stringify(error, null, 2));
 
