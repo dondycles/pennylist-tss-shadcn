@@ -48,6 +48,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { userSettingsQueryOptions } from "@/lib/queries/user";
 import { updateUserSettings } from "@/lib/server/fn/user";
@@ -75,7 +76,16 @@ function RouteComponent() {
       </div>
       <Suspense
         fallback={
-          <p className="text-muted-foreground text-center text-sm">Getting settings...</p>
+          <div className="w-full space-y-4 px-4">
+            <Skeleton className="h-21 w-full rounded-3xl" />
+            <Separator />
+            <Skeleton className="h-17 w-full rounded-3xl" />
+            <Skeleton className="h-17 w-full rounded-3xl" />
+            <Skeleton className="h-17 w-full rounded-3xl" />
+            <Skeleton className="h-17 w-full rounded-3xl" />
+            <Separator />
+            <Skeleton className="bg-destructive h-9 w-full rounded-full" />
+          </div>
         }
       >
         <SettingsComponent />

@@ -12,6 +12,7 @@ import Scrollable from "@/components/Scrollable";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import useAutoLoadNextPage from "@/lib/hooks/use-auto-reload-infinite-q";
 import { logsQueryOptions } from "@/lib/queries/logs";
 import { moneyIdsQueryOptions } from "@/lib/queries/money";
@@ -48,7 +49,17 @@ function RouteComponent() {
       <SearchInput />
       <Suspense
         fallback={
-          <p className="text-muted-foreground text-center text-sm">Getting logs...</p>
+          <div className="w-full space-y-4 px-4">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={`skeleton-${i}`} className="space-y-4 border-b pb-4">
+                <Skeleton className="h-12 w-full rounded-full" />
+                <div className="grid grid-cols-2 gap-4">
+                  <Skeleton className="h-40 w-full rounded-3xl" />
+                  <Skeleton className="h-40 w-full rounded-3xl" />
+                </div>
+              </div>
+            ))}
+          </div>
         }
       >
         <Logs />

@@ -29,8 +29,11 @@ function RouteComponent() {
       </div>
       <Suspense
         fallback={
-          <div className="w-full px-4">
-            <Skeleton className="h-42 w-full" />
+          <div className="w-full space-y-4 px-4">
+            <Skeleton className="h-12 w-full rounded-full" />
+            <Skeleton className="h-52 w-full rounded-2xl" />
+            <Skeleton className="h-52 w-full rounded-2xl" />
+            <Skeleton className="h-52 w-full rounded-2xl" />
           </div>
         }
       >
