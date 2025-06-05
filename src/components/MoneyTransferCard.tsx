@@ -42,7 +42,6 @@ export default function MoneyTransferCard({
   if (receiver) {
     return (
       <div
-        key={receiver.id}
         style={{ color: receiver.color ?? "var(--foreground)" }}
         className="w-full text-left not-first:border-t not-first:pt-4"
       >

@@ -67,7 +67,6 @@ export default function MoneyCard({
   return (
     <div
       hidden={transferRole !== "none"}
-      key={m.id}
       style={{
         color: m.color ?? "var(--foreground)",
       }}

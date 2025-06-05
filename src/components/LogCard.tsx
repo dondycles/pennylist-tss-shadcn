@@ -50,7 +50,7 @@ export default function LogCard({
   } = getDiff("totalMoney");
 
   return (
-    <div key={log.id} className="w-full pb-4 not-first:pt-4 not-last:border-b">
+    <div className="w-full pb-4 not-first:pt-4 not-last:border-b">
       {/* <pre>{log.moneyId}</pre>
       <pre>{JSON.stringify(log.transferDetails, null, 2)}</pre> */}
       <div className="w-full px-4">
