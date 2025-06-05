@@ -19,6 +19,24 @@ export function getSupabaseServerClient() {
           });
         },
       },
+      auth: {
+        persistSession: true,
+        storage: {
+          getItem: (key) => {
+            const cookies = parseCookies();
+            return cookies[key] || null;
+          },
+          setItem: (key, value) => {
+            setCookie(key, value);
+          },
+          removeItem: (key) => {
+            setCookie(key, "", { expires: new Date(0) });
+          },
+        },
+        storageKey: "supabase.auth.token",
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+      },
     },
   );
 }
