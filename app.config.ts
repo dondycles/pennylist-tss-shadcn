@@ -1,4 +1,3 @@
-import { serwist } from "@serwist/vite";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "@tanstack/react-start/config";
 import tsConfigPaths from "vite-tsconfig-paths";
@@ -9,13 +8,13 @@ export default defineConfig({
         projects: ["./tsconfig.json"],
       }),
       tailwindcss(),
-      serwist({
-        swSrc: "src/sw.ts",
-        swDest: "sw.js",
-        globDirectory: "src",
-        injectionPoint: "self.__SW_MANIFEST",
-        rollupFormat: "iife",
-      }),
+      // serwist({
+      //   swSrc: "src/sw.ts",
+      //   swDest: "sw.js",
+      //   globDirectory: "src",
+      //   injectionPoint: "self.__SW_MANIFEST",
+      //   rollupFormat: "iife",
+      // }),
     ],
   },
   // https://react.dev/learn/react-compiler
