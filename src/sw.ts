@@ -1,6 +1,5 @@
-import { defaultCache } from "@serwist/vite/worker";
 import type { PrecacheEntry, SerwistGlobalConfig } from "serwist";
-import { Serwist } from "serwist";
+import { Serwist, StaleWhileRevalidate } from "serwist";
 // This declares the value of `injectionPoint` to TypeScript.
 // `injectionPoint` is the string that will be replaced by the
 // actual precache manifest. By default, this string is set to
@@ -18,7 +17,12 @@ const serwist = new Serwist({
   skipWaiting: true,
   clientsClaim: true,
   navigationPreload: true,
-  runtimeCaching: defaultCache,
+  runtimeCaching: [
+    {
+      matcher: /.*/i,
+      handler: new StaleWhileRevalidate(),
+    },
+  ],
 });
 
 serwist.addEventListeners();
