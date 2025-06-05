@@ -64,9 +64,6 @@ import { toast } from "sonner";
 import { z } from "zod";
 export const Route = createFileRoute("/(user)/settings/")({
   component: RouteComponent,
-  loader: ({ context }) => {
-    context.queryClient.prefetchQuery(userSettingsQueryOptions());
-  },
 });
 
 function RouteComponent() {

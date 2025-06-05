@@ -31,18 +31,6 @@ export const Route = createFileRoute("/(user)/logs/")({
   beforeLoad: async ({ search }) => {
     return { search };
   },
-  loader: async ({ context }) => {
-    await context.queryClient.prefetchInfiniteQuery(
-      logsQueryOptions({
-        userId: context.user?.id,
-        flow: context.search.flow,
-        type: context.search.type,
-        money: context.search.money,
-        q: context.search.q,
-      }),
-    );
-    await context.queryClient.prefetchQuery(moneyIdsQueryOptions(context.user?.id));
-  },
 });
 
 function RouteComponent() {

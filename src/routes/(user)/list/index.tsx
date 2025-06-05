@@ -10,9 +10,6 @@ import { Suspense } from "react";
 
 export const Route = createFileRoute("/(user)/list/")({
   component: RouteComponent,
-  loader: ({ context }) => {
-    context.queryClient.prefetchQuery(moneysQueryOptions(context.user?.id));
-  },
 });
 function RouteComponent() {
   return (
