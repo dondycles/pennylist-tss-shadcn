@@ -15,27 +15,9 @@ export function getSupabaseServerClient() {
         },
         setAll(cookies) {
           cookies.forEach((cookie) => {
-            setCookie(cookie.name, cookie.value);
+            setCookie(cookie.name, cookie.value, { maxAge: 60 * 60 * 24 * 2 });
           });
         },
-      },
-      auth: {
-        persistSession: true,
-        storage: {
-          getItem: (key) => {
-            const cookies = parseCookies();
-            return cookies[key] || null;
-          },
-          setItem: (key, value) => {
-            setCookie(key, value);
-          },
-          removeItem: (key) => {
-            setCookie(key, "", { expires: new Date(0) });
-          },
-        },
-        storageKey: "supabase.auth.token",
-        autoRefreshToken: true,
-        detectSessionInUrl: true,
       },
     },
   );
