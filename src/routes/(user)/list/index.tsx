@@ -24,7 +24,7 @@ function RouteComponent() {
       />
       <Suspense
         fallback={Array.from({ length: 4 }).map((_, i) => (
-          <MoneySkeleton key={i} />
+          <MoneySkeleton key={`skeleton-${i}`} />
         ))}
       >
         <Moneys />
@@ -39,7 +39,7 @@ function Moneys() {
   const moneys = useSuspenseQuery(moneysQueryOptions(user?.id));
   return (
     <div>
-      {moneys.data?.map((m) => (
+      {moneys.data.map((m) => (
         <MoneyCard
           queryClient={queryClient}
           user={user}

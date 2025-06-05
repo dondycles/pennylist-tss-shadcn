@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
 import {
   Card,
@@ -126,14 +126,17 @@ export function TotalMoneyChart({
           </DropdownMenuContent>
         </DropdownMenu>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
         {!filteredData?.length ? (
           <p className="text-muted-foreground text-center text-sm">
             No data to show as of now
           </p>
         ) : (
           <>
-            <ChartContainer config={chartConfig} className="aspect-auto h-[150px] w-full">
+            <ChartContainer
+              config={chartConfig}
+              className="aspect-auto h-[200px] w-full rounded-2xl border p-4"
+            >
               <AreaChart data={filteredData}>
                 <defs>
                   <linearGradient id="totalMoney" x1="0" y1="0" x2="0" y2="1">
@@ -165,6 +168,19 @@ export function TotalMoneyChart({
                     });
                   }}
                 />
+                <YAxis
+                  tickLine={false}
+                  axisLine={false}
+                  minTickGap={32}
+                  tickFormatter={(value) => {
+                    const newValue = Intl.NumberFormat("en-US", {
+                      style: "currency",
+                      currency: "PHP",
+                      maximumFractionDigits: 0,
+                    }).format(value);
+                    return newValue;
+                  }}
+                />
                 <ChartTooltip
                   cursor={false}
                   content={
@@ -187,11 +203,13 @@ export function TotalMoneyChart({
                   isAnimationActive={false}
                   type="bump"
                 />
-
                 <ChartLegend content={<ChartLegendContent />} />
               </AreaChart>
             </ChartContainer>
-            <ChartContainer config={chartConfig} className="aspect-auto h-[150px] w-full">
+            <ChartContainer
+              config={chartConfig}
+              className="aspect-auto h-[200px] w-full rounded-2xl border p-4"
+            >
               <AreaChart data={filteredData}>
                 <defs>
                   <linearGradient id="totalAdditions" x1="0" y1="0" x2="0" y2="1">
@@ -223,6 +241,19 @@ export function TotalMoneyChart({
                     });
                   }}
                 />
+                <YAxis
+                  tickLine={false}
+                  axisLine={false}
+                  minTickGap={32}
+                  tickFormatter={(value) => {
+                    const newValue = Intl.NumberFormat("en-US", {
+                      style: "currency",
+                      currency: "PHP",
+                      maximumFractionDigits: 0,
+                    }).format(value);
+                    return newValue;
+                  }}
+                />
                 <ChartTooltip
                   cursor={false}
                   content={
@@ -250,7 +281,11 @@ export function TotalMoneyChart({
                 <ChartLegend content={<ChartLegendContent />} />
               </AreaChart>
             </ChartContainer>
-            <ChartContainer config={chartConfig} className="aspect-auto h-[150px] w-full">
+
+            <ChartContainer
+              config={chartConfig}
+              className="aspect-auto h-[200px] w-full rounded-2xl border p-4"
+            >
               <AreaChart data={filteredData}>
                 <defs>
                   <linearGradient id="totalDeductions" x1="0" y1="0" x2="0" y2="1">
@@ -295,7 +330,19 @@ export function TotalMoneyChart({
                     />
                   }
                 />
-
+                <YAxis
+                  tickLine={false}
+                  axisLine={false}
+                  minTickGap={32}
+                  tickFormatter={(value) => {
+                    const newValue = Intl.NumberFormat("en-US", {
+                      style: "currency",
+                      currency: "PHP",
+                      maximumFractionDigits: 0,
+                    }).format(value);
+                    return newValue;
+                  }}
+                />
                 <Area
                   dataKey="totalDeductions"
                   stroke="var(--chart-totalDeductions)"

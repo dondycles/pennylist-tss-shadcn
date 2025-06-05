@@ -214,8 +214,8 @@ function Logs() {
               if (i === _logs.length - 1)
                 return (
                   <React.Fragment key={log.id}>
-                    <div ref={ref} key={log.id} className="flex-1" />
-                    <LogCard log={log} key={log.id} />
+                    <div ref={ref} className="flex-1" />
+                    <LogCard log={log} />
                   </React.Fragment>
                 );
               return <LogCard log={log} key={log.id} />;
@@ -239,8 +239,8 @@ function Logs() {
             if (i === _logs.length - 1)
               return (
                 <React.Fragment key={log.id}>
-                  <div ref={ref} key={log.id} className="flex-1" />
-                  <LogCard log={log} key={log.id} />
+                  <div ref={ref} className="flex-1" />
+                  <LogCard log={log} />
                 </React.Fragment>
               );
             return <LogCard log={log} key={log.id} />;
