@@ -11,7 +11,7 @@ export function createRouter() {
     defaultOptions: {
       queries: {
         refetchOnWindowFocus: false,
-        staleTime: 1000 * 60, // 1 minute
+        staleTime: Infinity, // 1 minute
         retry: 0,
       },
     },
@@ -24,11 +24,12 @@ export function createRouter() {
       defaultPreload: "intent",
       // react-query will handle data fetching & caching
       // https://tanstack.com/router/latest/docs/framework/react/guide/data-loading#passing-all-loader-events-to-an-external-cache
-      defaultPreloadStaleTime: 0,
+      defaultPreloadStaleTime: Infinity,
       defaultErrorComponent: DefaultCatchBoundary,
       defaultNotFoundComponent: NotFound,
       scrollRestoration: true,
       defaultStructuralSharing: true,
+      defaultStaleTime: Infinity,
     }),
     queryClient,
   );
