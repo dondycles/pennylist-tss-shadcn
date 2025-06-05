@@ -12,7 +12,7 @@ export default defineConfig({
       serwist({
         swSrc: "src/sw.ts",
         swDest: "sw.js",
-        globDirectory: "dist",
+        globDirectory: "src",
         injectionPoint: "self.__SW_MANIFEST",
         rollupFormat: "iife",
       }),

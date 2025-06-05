@@ -51,6 +51,7 @@ export const Route = createRootRouteWithContext<{
       { rel: "icon", href: "/favicon.ico" },
       { rel: "apple-touch-icon", href: "/icon-256.png", sizes: "256x256" },
       { rel: "mask-icon", href: "/icon-512.png" },
+      { rel: "manifest", href: "/manifest.json" },
     ],
   }),
   component: RootComponent,
