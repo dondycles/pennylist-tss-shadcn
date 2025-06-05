@@ -13,8 +13,6 @@ export default defineConfig({
         swSrc: "src/sw.ts",
         swDest: "sw.js",
         globDirectory: "dist",
-        injectionPoint: "self.__SW_MANIFEST",
-        rollupFormat: "iife",
       }),
     ],
   },
