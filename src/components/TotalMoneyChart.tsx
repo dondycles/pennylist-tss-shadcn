@@ -135,7 +135,7 @@ export function TotalMoneyChart({
           <>
             <ChartContainer
               config={chartConfig}
-              className="aspect-auto h-52 w-full rounded-2xl border p-4"
+              className="aspect-auto h-52 w-full rounded-3xl border p-4"
             >
               <AreaChart data={filteredData}>
                 <defs>
@@ -208,7 +208,7 @@ export function TotalMoneyChart({
             </ChartContainer>
             <ChartContainer
               config={chartConfig}
-              className="aspect-auto h-52 w-full rounded-2xl border p-4"
+              className="aspect-auto h-52 w-full rounded-3xl border p-4"
             >
               <AreaChart data={filteredData}>
                 <defs>
@@ -284,7 +284,7 @@ export function TotalMoneyChart({
 
             <ChartContainer
               config={chartConfig}
-              className="aspect-auto h-52 w-full rounded-2xl border p-4"
+              className="aspect-auto h-52 w-full rounded-3xl border p-4"
             >
               <AreaChart data={filteredData}>
                 <defs>
