@@ -98,7 +98,7 @@ function DialogContent({
   className,
   children,
   from = "top",
-  transition = { type: "spring", stiffness: 150, damping: 25 },
+  transition = { type: "spring", stiffness: 250, damping: 25 },
   overlayClassName,
   ...props
 }: DialogContentProps & { showX?: boolean; overlayClassName?: string }) {
