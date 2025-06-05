@@ -145,7 +145,54 @@ export const getAnalytics = createServerFn({ method: "GET" })
       }
       return groupedByMonthArray;
     }
-    return { groupLogsByMonth: groupLogsByMonth(), groupLogsByDate: groupLogsByDate() };
+
+    function groupsLogsByMoney() {
+      if (!data?.length) return null;
+
+      const groupedByMoney: { [key: string]: typeof data } = {};
+      data.forEach((log) => {
+        if (log.moneyId === null) return;
+        if (!groupedByMoney[log.moneyId]) {
+          groupedByMoney[log.moneyId] = [log];
+        } else {
+          groupedByMoney[log.moneyId].push(log);
+        }
+      });
+
+      return Object.entries(groupedByMoney).map(([moneyId, logs]) => ({
+        moneyId,
+        logs: logs.sort(
+          (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+        ),
+        totalAdditions: Math.abs(
+          _.sum(
+            logs.map((log) =>
+              log.changes.current.amount < log.changes.prev.amount
+                ? 0
+                : log.changes.current.amount - log.changes.prev.amount,
+            ),
+          ),
+        ),
+        totalDeductions: Math.abs(
+          _.sum(
+            logs.map((log) =>
+              log.changes.current.amount < log.changes.prev.amount
+                ? log.changes.prev.amount - log.changes.current.amount
+                : 0,
+            ),
+          ),
+        ),
+        currentData: logs.sort(
+          (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+        )[0].changes.current,
+      }));
+    }
+
+    return {
+      groupLogsByMonth: groupLogsByMonth(),
+      groupLogsByDate: groupLogsByDate(),
+      groupsLogsByMoney: groupsLogsByMoney(),
+    };
   });
 
 export type Analytics = Awaited<ReturnType<typeof getAnalytics>>;

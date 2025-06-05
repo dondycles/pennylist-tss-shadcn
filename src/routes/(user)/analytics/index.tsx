@@ -7,6 +7,7 @@ export const Route = createFileRoute("/(user)/analytics/")({
   component: RouteComponent,
 });
 
+import { MoneyBreakdownBarChart } from "@/components/MoneyBreakdownBarChart";
 import { TotalMoneyChart } from "@/components/TotalMoneyChart";
 import { Skeleton } from "@/components/ui/skeleton";
 import { analyticsQueryOptions } from "@/lib/queries/analytics";
@@ -58,9 +59,12 @@ function Analytics({ user }: { user: GetUser }) {
   });
 
   return (
-    <TotalMoneyChart
-      data={analytics.data}
-      dateJoined={new Date(user?.createdAt ?? new Date())}
-    />
+    <>
+      <TotalMoneyChart
+        data={analytics.data}
+        dateJoined={new Date(user?.createdAt ?? new Date())}
+      />
+      <MoneyBreakdownBarChart data={analytics.data} />
+    </>
   );
 }
