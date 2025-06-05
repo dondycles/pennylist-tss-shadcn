@@ -14,8 +14,6 @@ import { Toaster } from "@/components/ui/sonner";
 import { userQueryOptions } from "@/lib/queries/user";
 import { getUser } from "@/lib/server/fn/user";
 import appCss from "@/lib/styles/app.css?url";
-import { useEffect } from "react";
-import { getSerwist } from "virtual:serwist";
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -65,28 +63,6 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: { readonly children: React.ReactNode }) {
-  useEffect(() => {
-    let serwist: Awaited<ReturnType<typeof getSerwist>> | undefined;
-    const onInstalled = () => {
-      console.log("Serwist installed!");
-    };
-
-    const loadSerwist = async () => {
-      if ("serviceWorker" in navigator) {
-        serwist = await getSerwist();
-
-        serwist?.addEventListener("installed", onInstalled);
-
-        void serwist?.register();
-      }
-    };
-
-    loadSerwist();
-
-    return () => {
-      serwist?.removeEventListener("installed", onInstalled);
-    };
-  }, []);
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
