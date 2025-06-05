@@ -7,6 +7,7 @@ import {
 import FloatingNav from "@/components/FloatingNav";
 import Slot from "@/components/Slot";
 import { userPINQueryOptions } from "@/lib/queries/user";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { OTPInput } from "input-otp";
 import { useState } from "react";
@@ -20,17 +21,16 @@ export const Route = createFileRoute("/(user)")({
         to: REDIRECT_URL,
       });
     }
-    const PIN = await context.queryClient.fetchQuery(userPINQueryOptions());
     return {
       redirectUrl: REDIRECT_URL,
-      PIN,
     };
   },
 });
 
 function RouteComponent() {
-  const { user, PIN } = Route.useRouteContext();
-  const [unLocked, setUnlocked] = useState(PIN === null);
+  const { user } = Route.useRouteContext();
+  const { data: PIN, isFetched } = useQuery(userPINQueryOptions());
+  const [unLocked, setUnlocked] = useState(isFetched && !PIN);
 
   if (user)
     return (
