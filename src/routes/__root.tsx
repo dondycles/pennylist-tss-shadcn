@@ -43,6 +43,8 @@ export const Route = createRootRouteWithContext<{
       },
       { name: "theme-color", content: "#000000" },
       { name: "background-color", content: "#000000" },
+      { name: "display", content: "standalone" },
+      { name: "mobile-web-app-capable", content: "yes" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -101,7 +103,6 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
         <Toaster richColors />
         <ReactQueryDevtools buttonPosition="bottom-left" />
         <TanStackRouterDevtools position="bottom-right" />
-
         <Scripts />
       </body>
     </html>
