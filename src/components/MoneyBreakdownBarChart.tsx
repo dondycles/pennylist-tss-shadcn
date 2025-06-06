@@ -99,7 +99,7 @@ export function MoneyBreakdownBarChart({ data }: { data: Analytics }) {
             }
             layout="vertical"
             margin={{
-              left: 0,
+              left: 24,
             }}
           >
             <CartesianGrid horizontal={false} />
