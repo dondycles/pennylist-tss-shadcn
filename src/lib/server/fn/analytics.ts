@@ -185,6 +185,10 @@ export const getAnalytics = createServerFn({ method: "GET" })
         currentData: logs.sort(
           (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
         )[0].changes.current,
+        fill:
+          logs.sort(
+            (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+          )[0].changes.current.color ?? "var(--foreground)",
       }));
     }
 
