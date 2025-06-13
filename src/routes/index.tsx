@@ -37,7 +37,7 @@ function Home() {
   ];
 
   return (
-    <div className="flex w-full flex-col gap-16 p-4 pt-[8dvh]">
+    <div className="flex h-full w-full flex-col gap-16 p-4 pt-[8dvh]">
       <div className="mx-auto flex w-full max-w-4xl flex-col items-center gap-4 text-center">
         <h1 className="text-4xl font-bold sm:text-6xl">
           Avoid becoming penniless, start using pennylist.

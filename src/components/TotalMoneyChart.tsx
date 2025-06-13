@@ -75,7 +75,7 @@ export function TotalMoneyChart({
           return date >= startDate;
         });
   return (
-    <Card className="border-b bg-transparent p-0 pb-4">
+    <Card className="bg-transparent p-0 pb-4">
       <CardHeader className="flex items-center gap-2 space-y-0 p-0 px-4 sm:flex-row">
         <div className="grid flex-1 gap-1">
           <CardTitle>Changes</CardTitle>
@@ -135,7 +135,7 @@ export function TotalMoneyChart({
           <>
             <ChartContainer
               config={chartConfig}
-              className="aspect-auto h-52 w-full rounded-3xl bg-[var(--chart-totalMoney)]/5 p-4"
+              className="aspect-auto h-52 w-full rounded-3xl border p-4"
             >
               <AreaChart data={filteredData}>
                 <defs>
@@ -208,7 +208,7 @@ export function TotalMoneyChart({
             </ChartContainer>
             <ChartContainer
               config={chartConfig}
-              className="aspect-auto h-52 w-full rounded-3xl bg-[var(--chart-totalAdditions)]/5 p-4"
+              className="aspect-auto h-52 w-full rounded-3xl border p-4"
             >
               <AreaChart data={filteredData}>
                 <defs>
@@ -281,9 +281,10 @@ export function TotalMoneyChart({
                 <ChartLegend content={<ChartLegendContent />} />
               </AreaChart>
             </ChartContainer>
+
             <ChartContainer
               config={chartConfig}
-              className="aspect-auto h-52 w-full rounded-3xl bg-[var(--chart-totalDeductions)]/5 p-4"
+              className="aspect-auto h-52 w-full rounded-3xl border p-4"
             >
               <AreaChart data={filteredData}>
                 <defs>
